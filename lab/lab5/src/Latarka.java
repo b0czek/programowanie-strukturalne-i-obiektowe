@@ -2,14 +2,15 @@
 public class Latarka {
     private int stan;
     private int kolor;
-    Latarka() {
+    public Latarka() {
         this.stan = 0;
         this.kolor = 0;
 
     }
 
     public void Wlacz() {
-        this.stan =1;
+        this.stan = 1;
+        this.kolor = 0;
     }
     public void Wylacz() {
         this.stan = 0;

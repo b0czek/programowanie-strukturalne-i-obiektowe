@@ -7,7 +7,12 @@ public class drugie {
 
     public static int[] createArray(int n) {
         Random generator = new Random();
-        return IntStream.range(0,n).map(i -> generator.nextInt(100)).toArray();
+//        return IntStream.range(0,n).map(i -> generator.nextInt(100)).toArray();
+        int[] arr = new int[n];
+        for(int i = 0 ; i < n ; i ++) {
+            arr[i] = generator.nextInt(100);
+        }
+        return arr;
     }
 
     public static void printArray(int[] arr) {
