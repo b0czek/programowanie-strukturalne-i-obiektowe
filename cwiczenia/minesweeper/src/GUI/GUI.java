@@ -10,20 +10,23 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class GUI extends JFrame {
+public class GUI {
+    private JFrame frame;
     private GridLayout layout;
     private Field[] fields;
     private ImageIcon bombIcon;
     public GUI(Plansza plansza) {
-        super();
-        this.setTitle("kocham wszystkie kotki na calym swiecie");
+        frame = new JFrame();
+        frame.setTitle("kocham wszystkie kotki na calym swiecie");
 
         this.layout = new GridLayout(plansza.getN(), plansza.getM());
-        this.getContentPane().setLayout(this.layout);
+        frame.getContentPane().setLayout(this.layout);
+
+
 
         fields = new Field[plansza.getN() *plansza.getM()];
 
-        this.setBounds(100, 100, 800, 800);
+        frame.setBounds(100, 100, 800, 800);
 
         try {
             this.bombIcon = new ImageIcon(ImageIO.read( new File("assets/cat.png")));
@@ -52,13 +55,13 @@ public class GUI extends JFrame {
                             }
                         }
                     });
-                    this.add(field);
+                    frame.add(field);
 
             }
         }
 
 
-        this.setVisible(true);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);    }
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);    }
 
 }
