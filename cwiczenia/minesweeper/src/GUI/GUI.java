@@ -1,67 +1,42 @@
 package GUI;
+import GUI.Views.GameView;
+import GUI.Views.MenuView;
+import GUI.Views.View;
 import plansza.Plansza;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-
 
 public class GUI {
     private JFrame frame;
-    private GridLayout layout;
-    private Field[] fields;
-    private ImageIcon bombIcon;
+
+    private Plansza plansza;
+
     public GUI(Plansza plansza) {
+        this.plansza = plansza;
+
         frame = new JFrame();
         frame.setTitle("kocham wszystkie kotki na calym swiecie");
+        frame.setBounds(0, 0, 800, 800);
 
-        this.layout = new GridLayout(plansza.getN(), plansza.getM());
-        frame.getContentPane().setLayout(this.layout);
+        frame.getContentPane().setLayout(new CardLayout());
+        this.addView(new MenuView(difficulty -> {
+              this.setCurrentView(GameView.class.getName());
+        }));
+        this.addView(new GameView(plansza));
 
-
-
-        fields = new Field[plansza.getN() *plansza.getM()];
-
-        frame.setBounds(100, 100, 800, 800);
-
-        try {
-            this.bombIcon = new ImageIcon(ImageIO.read( new File("assets/cat.png")));
-
-        }
-        catch(IOException ex) {
-            System.out.println("dupa");
-
-        }
-
-
-        for(int i = 0; i < plansza.getM(); i++) {
-            for(int j = 0 ; j < plansza.getN(); j++) {
-                    Field field = new Field(i,j);
-                    field.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            Field field = (Field)actionEvent.getSource();
-
-                            if(plansza.getCell(field.getM(), field.getN())) {
-                                field.setIcon(bombIcon);
-                            }
-                            else {
-                                field.setEnabled(false);
-
-                            }
-                        }
-                    });
-                    frame.add(field);
-
-            }
-        }
 
 
         frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);    }
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
 
+    private void addView(View view) {
+        this.frame.getContentPane().add(view, view.getClass().getName());
+    }
+
+    private void setCurrentView(String viewName) {
+        Container content = this.frame.getContentPane();
+        ((CardLayout)this.frame.getContentPane().getLayout()).show(content, viewName);
+    }
 }
