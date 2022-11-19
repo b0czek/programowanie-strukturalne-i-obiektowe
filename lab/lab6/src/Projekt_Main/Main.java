@@ -29,10 +29,12 @@ public class Main {
         int n = in.nextInt();
         Dlugopis[] piornik = createPiornik(n);
         printPiornik(piornik);
+
         // wyjmij 3 ostatnie dlugopisy
         for(int i = Math.max(n - 3, 0); i < n; i++) {
             Uczen.wyjmijDlugopis(piornik[i]);
         }
+
         // wloz ostatni dlugopis z powrotem
         Uczen.wlozDlugopis(piornik[n -1]);
 

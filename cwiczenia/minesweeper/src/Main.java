@@ -12,7 +12,8 @@ public class Main {
             SwingUtilities.invokeAndWait(() -> new GUI(plansza));
         }
         catch(Exception ex) {
-            System.out.println("Could not start gui");
+            ex.printStackTrace();
+            System.out.println("Could not start gui - " + ex.getMessage());
         }
     }
 }

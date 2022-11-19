@@ -13,19 +13,25 @@ public class Dlugopis {
         this.wklad = new Wklad(kolor);
         this.jestwPiorniku = true;
     }
+    public String getStan() {
+        return "Dlugopis - kolor: " + this.wklad.getKolor() + ", jestwPiorniku: " + this.jestwPiorniku;
+    }
 
-
-    public boolean getStan() {
+    public boolean getJestwPiorniku() {
         return this.jestwPiorniku;
     }
+    public void setJestwPiorniku(boolean stan) {
+        this.jestwPiorniku = stan;
+    }
+
     public void wyjmijzPiornika() {
-        this.jestwPiorniku = false;
+        this.setJestwPiorniku(false);
     }
     public void wlozdoPiornika() {
-        this.jestwPiorniku = true;
+        this.setJestwPiorniku(true);
     }
     public Wklad getWklad() {
         return this.wklad;
     }
-
+    public void setWklad(Wklad wklad) { this.wklad = wklad;}
 }
