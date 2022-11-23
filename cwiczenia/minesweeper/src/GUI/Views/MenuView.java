@@ -1,6 +1,6 @@
 package GUI.Views;
 
-import GUI.Difficulty.Difficulty;
+import plansza.Difficulty;
 
 import javax.swing.*;
 

@@ -1,4 +1,4 @@
-package GUI.Difficulty;
+package plansza;
 
 public class Difficulty {
     private int m,n,bombsCount;
