@@ -13,18 +13,53 @@ public class GameView extends View {
 
 
     private Board board;
-    public GameView(Plansza plansza) {
+    private Plansza plansza;
+    public GameView(Plansza plansza, GameViewCallback callback) {
         super();
-        this.board = new Board(plansza);
-        this.add(this.board);
+        this.plansza = plansza;
+
+        JButton back = new JButton("<-");
+        back.addActionListener(actionEvent -> callback.onMenuReturn());
+        this.add(back);
+
+        this.createBoard(plansza);
+
 
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 System.out.println(board.getWidth());
-                board.setSize(getWidth(),getHeight());
+                resizeBoard();
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                super.componentShown(e);
+                System.out.println("component shown");
+                resizeBoard();
             }
         });
+    }
+
+    private void resizeBoard(){
+        board.setSize(getWidth(),getHeight());
+    }
+
+    private void createBoard(Plansza plansza) {
+        if(this.board != null) {
+            this.remove(this.board);
+
+        }
+        this.board = new Board(plansza);
+        this.add(this.board);
+        this.resizeBoard();
+    }
+
+    // reset board on returning view
+    @Override
+    public void onViewShown() {
+        super.onViewShown();
+        this.createBoard(plansza);
     }
 }

@@ -25,7 +25,7 @@ public class Field extends JButton {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 Stan state = f.getState();
-                System.out.println(state.name());
+
                 if(state == Stan.Odkryta) {
                     return;
                 }

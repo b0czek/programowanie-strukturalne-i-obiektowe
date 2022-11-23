@@ -6,6 +6,8 @@ import plansza.Plansza;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class GUI {
     private JFrame frame;
@@ -21,10 +23,10 @@ public class GUI {
 
         frame.getContentPane().setLayout(new CardLayout());
         this.addView(new MenuView(difficulty -> {
-              this.setCurrentView(GameView.class.getName());
+            this.plansza.init(difficulty);
+            this.setCurrentView(GameView.class.getName());
         }));
-        this.addView(new GameView(plansza));
-
+        this.addView(new GameView(plansza, () -> this.setCurrentView(MenuView.class.getName())));
 
 
         frame.setVisible(true);
@@ -37,6 +39,15 @@ public class GUI {
 
     private void setCurrentView(String viewName) {
         Container content = this.frame.getContentPane();
-        ((CardLayout)this.frame.getContentPane().getLayout()).show(content, viewName);
+        Optional<Component> component = Arrays.stream(content.getComponents())
+                                                .filter(c -> c.getClass().getName().matches(viewName))
+                                                .findAny();
+        if(component.isEmpty()) {
+            // should throw i guess
+            return;
+        }
+        ((CardLayout)content.getLayout()).show(content, viewName);
+        ((View)component.get()).onViewShown();
+        this.frame.setSize(this.frame.getWidth()-1, this.frame.getHeight());
     }
 }

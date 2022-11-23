@@ -1,11 +1,12 @@
 import GUI.GUI;
+import plansza.Difficulty;
 import plansza.Plansza;
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        Plansza plansza = new Plansza(10,10);
-        plansza.init(10);
+        Plansza plansza = new Plansza();
+//        plansza.init(Difficulty.difficulties[0]);
         plansza.Drukowanie();
 
         try {
