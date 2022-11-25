@@ -1,48 +1,57 @@
 package plansza;
-import plansza.Plansza;
 
 
 public class Pole {
-    private boolean isbomb;
+    private int m,n;
+    private boolean isBomb;
     private Stan state;
-    private int liczba_bomb;
+    private int nearBombsCount;
 
 
 
-    public Pole() {
-        this.isbomb = false;
+    public Pole(int m, int n) {
+        this.m = m;
+        this.n = n;
+        this.isBomb = false;
         this.state = Stan.Zakryta;
-        this.liczba_bomb = 0;
+        this.nearBombsCount = 0;
     }
 
-    public Pole(boolean isbomb, Stan state, int liczba_bomb) {
-        this.isbomb = isbomb;
-        this.state = state;
-        this.liczba_bomb = liczba_bomb;
+//    public Pole(boolean isBomb, Stan state, int nearBombsCount) {
+//        this.isBomb = isBomb;
+//        this.state = state;
+//        this.nearBombsCount = nearBombsCount;
+//    }
+
+    public void setIsBomb(boolean isBomb) {
+        this.isBomb = isBomb;
     }
 
-    public boolean getBomb() {
-        return isbomb;
+    public boolean getIsBomb() {
+        return isBomb;
     }
-    public int getLiczba_bomb() {
-        return liczba_bomb;
-    }
-    public Stan getState() {
-        return state;
-    }
-    public void setBomb(boolean isbomb) {
-        this.isbomb = isbomb;
-    }
+
     public void setState(Stan state)
     {
         this.state = state;
     }
-    public void setLiczba_bomb(int liczba_bomb){
-        this.liczba_bomb = liczba_bomb;
+    public Stan getState() {
+        return state;
     }
 
+    public void setNearBombsCount(int nearBombsCount){
+        this.nearBombsCount = nearBombsCount;
+    }
 
+    public int getNearBombsCount() {
+        return nearBombsCount;
+    }
 
+    public int getM() {
+        return m;
+    }
 
-
+    public int getN() {
+        return n;
+    }
 }

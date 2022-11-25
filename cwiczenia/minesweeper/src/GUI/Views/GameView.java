@@ -22,6 +22,15 @@ public class GameView extends View {
         back.addActionListener(actionEvent -> callback.onMenuReturn());
         this.add(back);
 
+
+//        JButton reset = new JButton("reset");
+//        reset.addActionListener(actionEvent -> {
+//            plansza.init(plansza.getSelectedDifficulty());
+//            createBoard(plansza);
+//            resizeBoard();
+//        });
+//        this.add(reset);
+
         this.createBoard(plansza);
 
 
@@ -36,7 +45,6 @@ public class GameView extends View {
             @Override
             public void componentShown(ComponentEvent e) {
                 super.componentShown(e);
-                System.out.println("component shown");
                 resizeBoard();
             }
         });

@@ -11,34 +11,33 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Field extends JButton {
-    private int m,n;
+    private static Color[] labelColors = {
+            new Color(255,255,255),
+            new Color(0,0,255),
+            new Color(0,200,0),
+            new Color(255,0,0),
+            new Color(0,0,139),
+            new Color(150,75,0),
+            new Color(0,255,255),
+            new Color(0,0,0),
+            new Color(160,170,175)
+    };
     private Pole f;
     private String iconName;
-    public Field(int m, int n, Pole f) {
+    public Field(Pole f, FieldActionCallback callback) {
         super();
-        this.m = m;
-        this.n = n;
         this.f = f;
 
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                Stan state = f.getState();
-
-                if(state == Stan.Odkryta) {
-                    return;
-                }
 
                 if(SwingUtilities.isRightMouseButton(e)) {
-                    toggleFlag();
+                    callback.fieldFlagToggled(fieldThis());
                 }
-                else if(state == Stan.Zakryta){
-                    f.setState(Stan.Odkryta);
-                    setEnabled(false);
-                    if(f.getBomb()) {
-                        setIcon(FieldIcons.Bomb);
-                    }
+                else {
+                    callback.fieldRevealed(fieldThis());
                 }
             }
         });
@@ -57,11 +56,15 @@ public class Field extends JButton {
     }
 
     public int getM() {
-        return this.m;
+        return this.f.getM();
     }
 
     public int getN() {
-        return this.n;
+        return this.f.getN();
+    }
+
+    public Pole getPole() {
+        return this.f;
     }
 
     public void setIcon(FieldIcons fieldIcon) {
@@ -80,14 +83,30 @@ public class Field extends JButton {
         super.setIcon(null);
     }
 
-    public void toggleFlag() {
-        if (this.f.getState() == Stan.Zflagowana) {
-            this.removeIcon();
-            this.f.setState(Stan.Zakryta);
-        } else {
-            this.setIcon(FieldIcons.Flag);
-            this.f.setState(Stan.Zflagowana);
+    public void refreshField() {
+        this.setEnabled(true);
+        this.removeIcon();
+        switch(this.f.getState()) {
+            case Odkryta:
+                this.setContentAreaFilled(false);
+                if(this.f.getIsBomb()) {
+                    this.setIcon(FieldIcons.Bomb);
+                }
+                else {
+                    int nearBombs = f.getNearBombsCount();
+                    if(nearBombs > 0) {
+                        this.setText(String.format("%d", f.getNearBombsCount()));
+                        this.setForeground(Field.labelColors[nearBombs]);
+                    }
 
+                }
+                break;
+            case Zflagowana:
+                this.setIcon(FieldIcons.Flag);
+                break;
         }
+    }
+    private Field fieldThis() {
+        return this;
     }
 }
