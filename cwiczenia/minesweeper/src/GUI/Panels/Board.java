@@ -31,6 +31,7 @@ public class Board extends JPanel {
 
         this.fields = new Field[plansza.getM()][plansza.getN()];
 
+        FieldFontProvider.init(20);
         try {
             FieldIconStore.init();
         }
@@ -49,6 +50,8 @@ public class Board extends JPanel {
 
                 int fSize = calculateFieldSize(plansza);
                 FieldIconStore.scaleAll(fSize);
+
+                FieldFontProvider.changeFontSize(fSize - 5);
 
             }
         });

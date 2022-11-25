@@ -25,6 +25,9 @@ public class Field extends JButton {
     private String iconName;
     public Field(Pole f, FieldActionCallback callback) {
         super();
+        this.setFont(FieldFontProvider.getFont());
+        this.setMargin(new Insets(0, 0, 0, 0));
+
         this.f = f;
 
         this.addMouseListener(new MouseAdapter() {
@@ -49,6 +52,7 @@ public class Field extends JButton {
                 if(iconName != null) {
                     setIcon(iconName);
                 }
+                setFont(FieldFontProvider.getFont());
             }
         });
 
