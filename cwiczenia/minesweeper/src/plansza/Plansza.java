@@ -1,7 +1,6 @@
 package plansza;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Plansza {
 
@@ -105,7 +104,7 @@ public class Plansza {
 
         // if bomb is hit, game over
         if(pole.getIsBomb()) {
-            Pole[] affectedFields = Arrays.stream(this.pola).flatMap(p -> Arrays.stream(p)).toArray(Pole[]::new);
+            Pole[] affectedFields = Arrays.stream(this.pola).flatMap(Arrays::stream).toArray(Pole[]::new);
             for (Pole field: affectedFields) {
                 field.setState(Stan.Odkryta);
             }
@@ -133,13 +132,13 @@ public class Plansza {
 
         for (int i = 0; i < bombCount; i++)
         {
-            int n,m = 0;
+            int n,m;
             do
             {
                 n = generator.nextInt(this.getN());
                 m = generator.nextInt(this.getM());
             }
-            // dont place bombs in 3x3 rectangle near field at x,y
+            // don't place bombs in 3x3 rectangle near field at x,y
             while (
                     (m >= Math.max(x - 1, 0)
                             && m <= Math.min(x + 1, pola.length)

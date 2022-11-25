@@ -4,7 +4,6 @@ public class Difficulty {
     private int m,n,bombsCount;
     private String difficultyName;
 
-    private Difficulty() {}
     public Difficulty(String difficultyName, int m, int n, int bombsCount) {
         this.m = m;
         this.n = n;

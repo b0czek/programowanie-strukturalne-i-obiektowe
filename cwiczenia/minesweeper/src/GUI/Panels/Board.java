@@ -1,10 +1,8 @@
 package GUI.Panels;
 
 import plansza.Plansza;
-import plansza.Stan;
 
 import javax.swing.*;
-import javax.swing.text.html.Option;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;

@@ -1,7 +1,6 @@
 package GUI.Panels;
 
 import plansza.Pole;
-import plansza.Stan;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Field extends JButton {
-    private static Color[] labelColors = {
+    private static final Color[] labelColors = {
             new Color(255,255,255),
             new Color(0,0,255),
             new Color(0,200,0),
