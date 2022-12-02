@@ -1,4 +1,4 @@
-package GUI.Panels;
+package GUI.Panels.Board;
 
 public interface FieldActionCallback {
     void fieldRevealed(Field field);

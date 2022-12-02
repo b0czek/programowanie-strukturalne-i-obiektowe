@@ -17,8 +17,7 @@ public class Lekarz extends Osoba {
         this.t = null;
     }
     public Lekarz(String nazwisko, String pesel, String spec, int stawka) {
-        this.nazwisko = nazwisko;
-        this.pesel = pesel;
+        super(nazwisko, pesel);
         this.s = spec;
         this.stawka = stawka;
         this.t = genT();
@@ -26,6 +25,7 @@ public class Lekarz extends Osoba {
     }
 
     public double Oblicz() {
+    	if (this.t == null) return 0;
         return this.stawka * Arrays.stream(this.t).sum();
     }
 

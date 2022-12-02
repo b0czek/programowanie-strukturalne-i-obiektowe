@@ -1,6 +1,7 @@
 package Przychodnia;
 
 import java.util.Arrays;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class Pacjent extends Osoba {
@@ -18,7 +19,7 @@ public class Pacjent extends Osoba {
         this.wizyty = new Wizyta[n];
 
         for(int i = 0; i < n; i++) {
-            wizyty[i] = new Wizyta(i * 10000 - n*i*241, i* 12 - n, i %2 ==0, (n-i)%2==0);
+            wizyty[i] = new Wizyta(i + 10000 - n*i*241, ((new Random()).nextInt(3)+1)*100, i %2 ==0, (n-i)%2==0);
         }
 
 

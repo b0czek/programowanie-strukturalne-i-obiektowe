@@ -26,6 +26,7 @@ public class Difficulty {
     }
 
     public static Difficulty[] difficulties = {
+            new Difficulty("Natalka", 8 ,8 ,2),
             new Difficulty("Poczatkujacy", 8,8, 10),
             new Difficulty("Zaawansowany", 16,16, 40),
             new Difficulty("Ekspert", 30,16, 99),

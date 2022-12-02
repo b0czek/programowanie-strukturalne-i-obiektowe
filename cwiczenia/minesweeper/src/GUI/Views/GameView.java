@@ -1,6 +1,6 @@
 package GUI.Views;
 
-import GUI.Panels.Board;
+import GUI.Panels.Board.Board;
 import plansza.Plansza;
 
 import javax.swing.*;
@@ -37,7 +37,6 @@ public class GameView extends View {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                System.out.println(board.getWidth());
                 resizeBoard();
             }
 

@@ -1,4 +1,6 @@
 import GUI.GUI;
+//import GUI.Panels.GameTimer;
+import GUI.Panels.GameTimer;
 import plansza.Plansza;
 import javax.swing.*;
 

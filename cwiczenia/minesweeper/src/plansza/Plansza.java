@@ -73,6 +73,10 @@ public class Plansza {
         return this.pola[m][n];
     }
 
+    public int getRevealedFieldsCount() {
+        return this.revealedFieldsCount;
+    }
+
     public Optional<Pole> placeFlag(Pole pole) {
 
         if(pole.getState() != Stan.Zakryta) {

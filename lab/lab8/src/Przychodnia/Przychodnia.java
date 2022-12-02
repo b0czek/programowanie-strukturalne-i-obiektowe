@@ -21,7 +21,7 @@ public class Przychodnia {
 
         osoby[n++] = new Lekarz();
         for(int i = 0 ; i < 3; i++, n++) {
-            osoby[n] = new Lekarz(nazwiska[n], genPesel(), specjalizacje[i], 10000 + i*1000);
+            osoby[n] = new Lekarz(nazwiska[n], genPesel(), specjalizacje[i],(i+1)* 100);
         }
 
         for(int i = 0; i < n; i++) {
@@ -63,7 +63,7 @@ public class Przychodnia {
                 m = i;
             }
             if(osoby[i] instanceof Lekarz) {
-                if(((Lekarz) osoby[i]).getStawka() > ((Lekarz) osoby[m]).getStawka()) {
+                if(((Lekarz) osoby[i]).Oblicz() > ((Lekarz) osoby[m]).Oblicz()) {
                     m = i;
                 }
             }

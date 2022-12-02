@@ -1,4 +1,4 @@
-package GUI.Panels;
+package GUI.Panels.Board;
 
 import javax.swing.*;
 import java.awt.*;

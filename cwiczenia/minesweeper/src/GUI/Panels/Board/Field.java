@@ -1,4 +1,4 @@
-package GUI.Panels;
+package GUI.Panels.Board;
 
 import plansza.Pole;
 
@@ -12,12 +12,12 @@ import java.awt.event.MouseEvent;
 public class Field extends JButton {
     private static final Color[] labelColors = {
             new Color(255,255,255),
-            new Color(0,0,255),
-            new Color(0,200,0),
-            new Color(255,0,0),
+            new Color(255,50,30),
+            new Color(0,200,200),
+            new Color(255,0,255),
             new Color(0,0,139),
             new Color(150,75,0),
-            new Color(0,255,255),
+            new Color(0,255,0),
             new Color(0,0,0),
             new Color(160,170,175)
     };
