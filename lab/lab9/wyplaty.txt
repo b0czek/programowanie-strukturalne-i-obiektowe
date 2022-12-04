@@ -1,0 +1,11 @@
+pensja: 5000.00, Karta: numer 4: nazwisko Kozłowska - premia 20%
+pensja: 5100.00, Karta: numer 5: nazwisko Mazur - premia 20%
+pensja: 4800.00, Karta: numer 6: nazwisko Zając - premia 20%
+pensja: 5300.00, Karta: numer 7: nazwisko Król - premia 20%
+pensja: 4600.00, Karta: numer 8: nazwisko Kaczmarek - premia 20%
+pensja: 5500.00, Karta: numer 9: nazwisko Wieczorek - premia 20%
+pensja: 4400.00, Karta: numer 10: nazwisko Walczak - premia 20%
+pensja: 5700.00, Karta: numer 11: nazwisko Baran - premia 20%
+pensja: 4200.00, Karta: numer 12: nazwisko Jankowski - premia 20%
+pensja: 5900.00, Karta: numer 13: nazwisko Wójcik - premia 20%
+pensja: 5000.00, Karta: numer 15: nazwisko Wisniewski - premia 20%
