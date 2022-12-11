@@ -16,7 +16,7 @@ public class Wyplata {
     }
 
     public String toString() {
-        return "pensja: " + pensja + " karta: " + this.karta.getClass().getSimpleName();
+        return "pensja: " + pensja + " karta: " + this.karta.toString();
     }
 
     public double pensjaZPremia() {
@@ -27,11 +27,12 @@ public class Wyplata {
         return karta;
     }
 
-    public int getNumerWyplaty() {
+    public static int getNumerWyplaty() {
         return numerWyplaty;
     }
 
     public double getPensja() {
         return pensja;
     }
+
 }

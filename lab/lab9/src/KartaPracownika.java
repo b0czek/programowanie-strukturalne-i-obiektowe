@@ -13,7 +13,7 @@ public abstract class KartaPracownika {
     }
 
     public String toString() {
-        return numer + " " + nazwisko;
+        return this.getClass().getSimpleName() + " nr wyplaty " + numer + " " + nazwisko;
     }
 
     public abstract float premia();

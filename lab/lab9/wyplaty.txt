@@ -8,4 +8,3 @@ pensja: 4400.00, Karta: numer 10: nazwisko Walczak - premia 20%
 pensja: 5700.00, Karta: numer 11: nazwisko Baran - premia 20%
 pensja: 4200.00, Karta: numer 12: nazwisko Jankowski - premia 20%
 pensja: 5900.00, Karta: numer 13: nazwisko Wójcik - premia 20%
-pensja: 5000.00, Karta: numer 15: nazwisko Wisniewski - premia 20%
