@@ -29,13 +29,28 @@ public class PlayerCircle {
         return players.get(currentPlayerIdx);
     }
 
+    public Player peekNextPlayer() {
+        return players.get(getNextPlayerIdx());
+    }
+
     public Player getNextPlayer() {
-        currentPlayerIdx = (currentPlayerIdx + (gameDirection == GameDirection.CLOCKWISE ? 1 : -1)) % players.size();
+        goToNextPlayer();
         return getCurrentPlayer();
+    }
+
+    public void goToNextPlayer() {
+        currentPlayerIdx = getNextPlayerIdx();
+    }
+
+    private int getNextPlayerIdx() {
+        return  (currentPlayerIdx + (gameDirection == GameDirection.CLOCKWISE ? 1 : -1)) % players.size();
     }
 
     public int size() {
         return players.size();
     }
 
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
 }

@@ -1,7 +1,10 @@
 package Uno.Engine.Deck;
 
+import Uno.Engine.Card.Action;
 import Uno.Engine.Card.Card;
 import Uno.Engine.Pile.Pile;
+
+import java.util.Random;
 
 public class Deal {
     private final static int CARDS_DEALT = 7;
@@ -18,6 +21,16 @@ public class Deal {
                 deals[i][j] = deck.draw();
             }
         }
+
+        // prevent from draw 4 wildcard being at the top of the remainder
+        // swap it with random card in the deck
+        while(d.get(d.size() -1).getAction() == Action.WILD_DRAW_4) {
+            int randomCardIdx = new Random().nextInt(d.size());
+            Card temp = d.get(d.size() - 1);
+            d.set(d.size() - 1, d.get(randomCardIdx));
+            d.set(randomCardIdx, temp);
+        }
+
         this.remainder = new Pile(d);
     }
 

@@ -13,6 +13,8 @@ public class Pile extends ArrayList<Card> {
         super();
     }
 
+    public Pile(Card card) { super(); this.add(card); }
+
     public Pile(Collection<Card> d) {
         super();
         this.addAll(d);
@@ -24,4 +26,5 @@ public class Pile extends ArrayList<Card> {
     public Card draw() {
         return this.remove(this.size() - 1);
     }
+
 }

@@ -7,14 +7,11 @@ public class Card {
     private Action action;
 
 
-    private Card() {}
-
-
     public Card(Color color, Value value, Action action) {
         this.color = color;
         this.value = value;
         this.action = action;
-    }
+        }
 
     public Card(Color color, Value value) {
         this.color = color;
@@ -46,8 +43,21 @@ public class Card {
         return this.value != Value.NONE;
     }
 
+
+
+
     @Override
     public String toString() {
         return String.format("[Card: color: %s, value: %d, action: %s]", Color.class.getEnumConstants()[this.color.ordinal()], this.value.ordinal(), Action.class.getEnumConstants()[this.action.ordinal()]);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Card)) {
+            return false;
+        }
+        Card c = (Card)obj;
+        return c.getAction() == this.action && c.getColor() == this.color && c.getValue() == this.value;
+    }
+
 }

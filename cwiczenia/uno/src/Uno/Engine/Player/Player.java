@@ -8,6 +8,7 @@ import java.util.Collection;
 public class Player {
     private String name;
     private Pile hand;
+    private boolean yelledUno = false;
 
     public Player(String name, Collection<Card> hand) {
         this.name = name;
@@ -21,4 +22,14 @@ public class Player {
     public Pile getHand() {
         return hand;
     }
+
+    public boolean  removeCardFromHand(Card card) {
+        return this.getHand().remove(card);
+    }
+    public void addCardToHand(Card card) {
+        this.getHand().add(card);
+    }
+
+
+
 }
