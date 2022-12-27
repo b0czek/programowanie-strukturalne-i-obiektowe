@@ -44,6 +44,21 @@ public class Card {
     }
 
 
+    public int getPoints() {
+        switch(this.action) {
+            case NONE:
+                return this.value.ordinal();
+            case DRAW_TWO:
+            case REVERSE:
+            case SKIP:
+                return 20;
+            case WILD_CARD:
+            case WILD_DRAW_4:
+                return 50;
+        }
+        return 0;
+    }
+
     @Override
     public String toString() {
         return String.format("[Card: color: %s, value: %s, action: %s]",

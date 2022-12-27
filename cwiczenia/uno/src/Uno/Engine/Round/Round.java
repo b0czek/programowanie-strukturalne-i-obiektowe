@@ -11,6 +11,7 @@ import Uno.Engine.Player.Players;
 import Uno.Engine.Player.PlayerController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -57,6 +58,17 @@ public class Round {
         if(playedCard.isActionCard()) {
             playedCard.getAction().executeAction(new ActionContext(players, discardPile, drawPile, notifier));
         }
+    }
+
+    public int sumPoints() {
+        return players.getPlayers()
+                .stream()
+                .flatMapToInt(player -> player
+                            .getHand()
+                            .stream()
+                            .mapToInt(card -> card.getPoints())
+                )
+                .sum();
     }
 
 

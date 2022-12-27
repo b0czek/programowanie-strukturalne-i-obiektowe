@@ -31,16 +31,6 @@ public class Player {
         return hand;
     }
 
-    public static Card removeCardFromHand(Player player, Card card, RoundEventNotifier notifier) {
-
-        notifier.notifyCardRemovedFromHand(player.getInfo());
-        return player.getHand().remove(card) ? card : null;
-
-    }
-    public static void addCardToHand(Player player, Card card, RoundEventNotifier notifier) {
-        player.getHand().add(card);
-        notifier.notifyCardAddedToHand(player.getInfo());
-    }
 
     public boolean didYellUno() {
         return yelledUno;
@@ -73,5 +63,18 @@ public class Player {
     public PlayerInfo getInfo() {
         return new PlayerInfo(name, hand.size(), ordinal);
     }
+
+
+    public static Card removeCardFromHand(Player player, Card card, RoundEventNotifier notifier) {
+
+        notifier.notifyCardRemovedFromHand(player.getInfo());
+        return player.getHand().remove(card) ? card : null;
+
+    }
+    public static void addCardToHand(Player player, Card card, RoundEventNotifier notifier) {
+        player.getHand().add(card);
+        notifier.notifyCardAddedToHand(player.getInfo());
+    }
+
 
 }
