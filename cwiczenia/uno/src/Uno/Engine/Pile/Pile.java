@@ -1,7 +1,6 @@
 package Uno.Engine.Pile;
 
 import Uno.Engine.Card.Card;
-import Uno.Engine.Deck.Deck;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +18,11 @@ public class Pile extends ArrayList<Card> {
         super();
         this.addAll(d);
     }
+
+    public Card getLastCard() {
+        return this.get(this.size() -1);
+    }
+
 
     public void shuffle() {
         Collections.shuffle(this);

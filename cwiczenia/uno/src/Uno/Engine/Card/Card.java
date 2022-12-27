@@ -2,9 +2,9 @@ package Uno.Engine.Card;
 
 public class Card {
 
-    private Color color;
-    private Value value;
-    private Action action;
+    private final Color color;
+    private final Value value;
+    private final Action action;
 
 
     public Card(Color color, Value value, Action action) {
@@ -44,19 +44,20 @@ public class Card {
     }
 
 
-
-
     @Override
     public String toString() {
-        return String.format("[Card: color: %s, value: %d, action: %s]", Color.class.getEnumConstants()[this.color.ordinal()], this.value.ordinal(), Action.class.getEnumConstants()[this.action.ordinal()]);
+        return String.format("[Card: color: %s, value: %s, action: %s]",
+                this.color.toString(),
+                this.value.toString(),
+                this.action.toString()
+        );
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Card)) {
+        if(!(obj instanceof Card c)) {
             return false;
         }
-        Card c = (Card)obj;
         return c.getAction() == this.action && c.getColor() == this.color && c.getValue() == this.value;
     }
 

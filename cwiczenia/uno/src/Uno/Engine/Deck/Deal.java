@@ -2,14 +2,16 @@ package Uno.Engine.Deck;
 
 import Uno.Engine.Card.Action;
 import Uno.Engine.Card.Card;
+import Uno.Engine.Card.Color;
+import Uno.Engine.Card.Value;
 import Uno.Engine.Pile.Pile;
 
 import java.util.Random;
 
 public class Deal {
     private final static int CARDS_DEALT = 7;
-    private Card[][] deals;
-    private Pile remainder;
+    private final Card[][] deals;
+    private final Pile remainder;
 
 
     public Deal(Deck deck, int playerCount) {

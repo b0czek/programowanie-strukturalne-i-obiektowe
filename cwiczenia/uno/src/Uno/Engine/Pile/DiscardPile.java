@@ -1,45 +1,76 @@
 package Uno.Engine.Pile;
 
+import Uno.Engine.Card.Action;
 import Uno.Engine.Card.Card;
 import Uno.Engine.Card.Color;
+import Uno.Engine.Card.Value;
+import Uno.Engine.Round.RoundEventNotifier;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class DiscardPile extends Pile {
 
+    private Color previousColor;
     private Color currentColor;
+    private RoundEventNotifier notifier = null;
 
-    public DiscardPile(Card startingCard) {
+    public DiscardPile() {
 
-        super(startingCard);
-        currentColor = startingCard.getColor();
+        super();
+        currentColor = Color.NONE;
+        previousColor = currentColor;
     }
 
-    public Card getLastCard() {
-        return this.get(this.size() -1);
+    public void place(Card card) {
+        if(!this.canUseCard(card)) {
+            throw new IllegalArgumentException("Card cannot be played");
+        }
+        if(!card.isWildCard()) {
+            this.setCurrentColor(card.getColor());
+        }
+
+        super.add(card);
+
+        if(notifier != null) {
+            notifier.notifyCardPlaced(card);
+        }
     }
+
+
 
     public Color getCurrentColor() {
         return currentColor;
     }
+    public void setCurrentColor(Color color) {
+        previousColor = currentColor;
+        this.currentColor = color;
+
+        if(notifier != null) {
+            notifier.notifyCurrentColorChange(currentColor);
+        }
+    }
+
+    public void setNotifier(RoundEventNotifier notifier) {
+        this.notifier = notifier;
+    }
 
     public boolean canUseCard(Card card) {
-        if(card.isWildCard()) {
-            return true;
-        }
-        if(card.getValue() == this.get(this.size()-1).getValue() || card.getColor() == this.getCurrentColor()) {
-            return true;
-        }
-        return false;
+        return  this.getCurrentColor() == Color.NONE || // happens only if game starts with wildcard
+                card.isWildCard() ||
+                (card.getValue() != Value.NONE && card.getValue() == getLastCard().getValue()) ||
+                (card.getAction() != Action.NONE && card.getAction() == getLastCard().getAction()) ||
+                card.getColor() == this.getCurrentColor();
     }
 
-
-    public void setCurrentColor(Color color) {
-        this.currentColor = color;
+    // wild draw 4 legality check
+    public boolean hadCardOfMatchingColor(Pile pile) {
+        return pile.stream().anyMatch(card -> card.getAction() == Action.NONE && card.getColor() == previousColor);
     }
+
+    public boolean canUseAnyCard(Pile pile ) {
+        return pile.stream().anyMatch(this::canUseCard);
+    }
+
 
     public List<Card> clearPile() {
         List<Card> subList = this.subList(0, this.size() - 2);
