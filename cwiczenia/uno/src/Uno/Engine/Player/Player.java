@@ -4,9 +4,10 @@ import Uno.Engine.Card.Card;
 import Uno.Engine.Pile.Pile;
 import Uno.Engine.Round.RoundEventNotifier;
 
+import java.io.Serializable;
 import java.util.Collection;
 
-public class Player {
+public class Player implements Serializable {
     private final String name;
     private final Pile hand;
     private final int ordinal;
@@ -14,7 +15,7 @@ public class Player {
     private boolean challengeable = false;
     private boolean drewCard = false;
 
-    public PlayerController controller;
+    public transient  PlayerController controller;
 
     public Player(int ordinal, PlayerController controller, String name, Collection<Card> hand) {
         this.ordinal = ordinal;

@@ -1,9 +1,16 @@
 package Uno.Engine.Player;
 
-public class PlayerInfo {
-    private final String name;
-    private final int cardsInHandCount;
-    private final int ordinal;
+import java.io.*;
+
+public class PlayerInfo implements Serializable {
+    public static final long serialVersionUID = 1L;
+
+
+    private String name;
+    private int cardsInHandCount;
+    private int ordinal;
+
+    public PlayerInfo() {}
 
     public PlayerInfo(String name, int cardsInHandCount, int ordinal ) {
         this.name = name;
@@ -22,4 +29,5 @@ public class PlayerInfo {
     public int getOrdinal() {
         return ordinal;
     }
+
 }

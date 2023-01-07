@@ -6,8 +6,6 @@ import Uno.Engine.Card.Color;
 import Uno.Engine.Card.Value;
 import Uno.Engine.Pile.Pile;
 
-import java.util.ArrayList;
-
 public class Deck extends Pile {
 
     public Deck() {

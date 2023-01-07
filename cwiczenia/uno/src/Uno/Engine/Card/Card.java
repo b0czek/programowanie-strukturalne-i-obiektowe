@@ -1,11 +1,16 @@
 package Uno.Engine.Card;
 
-public class Card {
+import java.io.*;
 
-    private final Color color;
-    private final Value value;
-    private final Action action;
+public class Card implements Serializable {
+    public static final long serialVersionUID = 1L;
 
+    private Color color;
+    private Value value;
+    private Action action;
+
+
+    public Card() {}
 
     public Card(Color color, Value value, Action action) {
         this.color = color;
@@ -45,18 +50,11 @@ public class Card {
 
 
     public int getPoints() {
-        switch(this.action) {
-            case NONE:
-                return this.value.ordinal();
-            case DRAW_TWO:
-            case REVERSE:
-            case SKIP:
-                return 20;
-            case WILD_CARD:
-            case WILD_DRAW_4:
-                return 50;
-        }
-        return 0;
+        return switch (this.action) {
+            case NONE -> this.value.ordinal();
+            case DRAW_TWO, REVERSE, SKIP -> 20;
+            case WILD_CARD, WILD_DRAW_4 -> 50;
+        };
     }
 
     @Override
