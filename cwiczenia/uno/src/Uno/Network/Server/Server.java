@@ -1,6 +1,6 @@
 package Uno.Network.Server;
 
-import Uno.Engine.Player.Player;
+import Uno.Network.Server.Message.Message;
 import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
 
 import java.io.ByteArrayInputStream;
@@ -13,7 +13,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,10 +25,12 @@ public class Server extends Thread {
     private final Selector selector;
     private ByteBuffer buffer = ByteBuffer.allocate(128 * 1024);
 
+    private ArrayList<ServerEvent> eventListeners = new ArrayList<>();
 
     private Set<SelectionKey> currentlyConnectedClients() {
         return selector.keys().stream().filter(k -> k.isValid() && k.channel() instanceof SocketChannel).collect(Collectors.toSet());
     }
+
     public long currentlyConnectedClientsCount() {
         return currentlyConnectedClients().size();
     }
@@ -37,8 +39,8 @@ public class Server extends Thread {
         System.out.println("client " + key.attachment() + " disconnected");
 
         key.channel().close();
+        this.notifyClientDisconnected(key);
 
-//        selector.
     }
 
     public Server(int serverPort) throws IOException {
@@ -53,10 +55,26 @@ public class Server extends Thread {
 
     }
 
+    public void close() throws IOException {
+        for (var selector : selector.keys()) {
+            selector.channel().close();
+        }
+        serverSocket.close();
+        selector.close();
+    }
+
+    public void addEventListener(ServerEvent listener) {
+        eventListeners.add(listener);
+    }
+
+    public boolean removeEventListener(ServerEvent listener) {
+        return eventListeners.remove(listener);
+    }
+
 
     @Override
     public void run() {
-        while(serverSocket.isOpen()) {
+        while (serverSocket.isOpen()) {
 
             try {
                 selector.select();
@@ -66,21 +84,21 @@ public class Server extends Thread {
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> iter = selectedKeys.iterator();
 
-            while(iter.hasNext()) {
+            while (iter.hasNext()) {
                 SelectionKey key = iter.next();
                 iter.remove();
 
-                if(key.isAcceptable()) {
+                if (key.isAcceptable()) {
                     handleAccept(key);
                 }
-                if(key.isReadable()) {
-                    read(key);
+                if (key.isReadable()) {
+                    handleRead(key);
                 }
             }
         }
     }
 
-    private void read(SelectionKey key) {
+    private void handleRead(SelectionKey key) {
 
         SocketChannel client = (SocketChannel) key.channel();
         buffer.clear();
@@ -88,11 +106,11 @@ public class Server extends Thread {
 
         try {
             int read;
-            while((read = client.read(buffer)) > 0) {
+            while ((read = client.read(buffer)) > 0) {
                 byteArrayOutputStream.write(buffer.array(), 0, read);
                 System.out.println(read);
             }
-            if(read < 0) {
+            if (read < 0) {
                 this.handleDisconnect(key);
                 return;
             }
@@ -102,13 +120,13 @@ public class Server extends Thread {
             return;
         }
 
-        try(
+        try (
                 ByteArrayInputStream bis = new ByteArrayInputStream(byteArrayOutputStream.getBuf(), 0, byteArrayOutputStream.getCount());
                 ObjectInputStream ois = new ObjectInputStream(bis);
 
         ) {
-            Player player = (Player)ois.readObject();
-            System.out.println(Arrays.toString(player.getHand().toArray()));
+            Message message = (Message) ois.readObject();
+            this.notifyClientRead(key, message);
 
 
         } catch (IOException | ClassNotFoundException ex) {
@@ -117,15 +135,13 @@ public class Server extends Thread {
 
     }
 
-    private void handleAccept(SelectionKey key)  {
+    private void handleAccept(SelectionKey key) {
         String address;
-        try
-        {
-
-            SocketChannel client = ((ServerSocketChannel)key.channel()).accept();
+        try {
+            SocketChannel client = ((ServerSocketChannel) key.channel()).accept();
             address = client.getRemoteAddress().toString();
 
-            System.out.println("client connecting from "  + address);
+            System.out.println("client connecting from " + address);
 
             client.configureBlocking(false);
             client.register(selector, SelectionKey.OP_READ, address);
@@ -133,18 +149,37 @@ public class Server extends Thread {
             System.out.println("client failed to connect");
             return;
         }
+        this.notifyClientConnected(key);
         System.out.println("accepted connection from " + address);
         System.out.println("current clients count: " + currentlyConnectedClientsCount());
 
     }
 
-    public void broadcast(byte[] message) {
-        ByteBuffer buf = ByteBuffer.wrap(message);
+
+    private ByteBuffer wrapMessage(Message message) {
+        try {
+            PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(pbos);
+            oos.writeObject(message);
+            return ByteBuffer.wrap(pbos.getBuf());
+        } catch (IOException ex) {
+            // should never happen
+            throw new IllegalStateException(ex);
+        }
+
+    }
+
+    public void broadcast(Message message) {
+        ByteBuffer buf = wrapMessage(message);
         var clients = this.currentlyConnectedClients();
-        System.out.println("broadcasting message to " + clients.size() + " clients");
-        for(SelectionKey key: clients) {
+
+        if (clients.size() != 0) {
+            System.out.println("broadcasting message to " + clients.size() + " clients");
+        }
+
+        for (SelectionKey key : clients) {
             try {
-                ((SocketChannel)key.channel()).write(buf);
+                ((SocketChannel) key.channel()).write(buf);
             } catch (IOException e) {
                 System.out.println("failed to send data to " + key.attachment());
             }
@@ -153,6 +188,21 @@ public class Server extends Thread {
     }
 
 
+    public void sendMessage(Message message, SelectionKey client) throws IOException {
+        ((SocketChannel) client.channel()).write(wrapMessage(message));
+    }
+
+    private void notifyClientConnected(SelectionKey key) {
+        eventListeners.forEach(listener -> listener.onClientConnected(key));
+    }
+
+    private void notifyClientDisconnected(SelectionKey key) {
+        eventListeners.forEach(listener -> listener.onClientDisconnected(key));
+    }
+
+    private void notifyClientRead(SelectionKey key, Message message) {
+        eventListeners.forEach(listener -> listener.onClientRead(key, message));
+    }
 
 }
 

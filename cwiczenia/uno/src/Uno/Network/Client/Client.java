@@ -23,8 +23,8 @@ public class Client {
 
     private static ByteBuffer buffer = ByteBuffer.allocate(64 * 1024);
 
-    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, InvocationTargetException {
-        SocketChannel s = SocketChannel.open(new InetSocketAddress("192.168.1.48", 42069));
+    public static void main(String[] args) throws IOException {
+        SocketChannel s = SocketChannel.open(new InetSocketAddress("localhost", 42069));
         s.configureBlocking(false);
         System.out.println("connecting to " + s.getRemoteAddress());
 
@@ -35,7 +35,7 @@ public class Client {
         PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(pbos);
 
-        oos.writeObject(new Player(0, new PlayerController(null), "chuj", new Deck()));
+//        oos.writeObject(new Player(0, new PlayerController(null), "name", new Deck()));
         System.out.println(pbos.getCount());
 
         s.write(ByteBuffer.wrap(pbos.getBuf()));
@@ -43,7 +43,6 @@ public class Client {
         while (s.isOpen()) {
 
             try {
-                System.out.println("selecting");
                 selector.select();
             } catch (IOException e) {
                 System.out.println("could not select keys " + e.getMessage());
@@ -54,10 +53,6 @@ public class Client {
             while (iter.hasNext()) {
                 SelectionKey key = iter.next();
                 iter.remove();
-                if (key.isConnectable()) {
-                    System.out.println("connectable");
-                    s.finishConnect();
-                }
                 if (key.isReadable()) {
                     System.out.println("readable");
 
