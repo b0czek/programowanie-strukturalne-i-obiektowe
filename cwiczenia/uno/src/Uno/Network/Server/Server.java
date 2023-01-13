@@ -2,7 +2,6 @@ package Uno.Network.Server;
 
 import Uno.Network.Server.Message.Message;
 import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,7 +18,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Server extends Thread {
-    private static final int MAX_CLIENTS = 10;
     private final int serverPort;
     private final ServerSocketChannel serverSocket;
     private final Selector selector;

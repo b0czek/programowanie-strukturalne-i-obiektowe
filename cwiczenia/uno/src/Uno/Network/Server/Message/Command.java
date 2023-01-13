@@ -1,8 +1,7 @@
 package Uno.Network.Server.Message;
 
 public enum Command {
-
-    SET_NAME, // set users name
+    JOIN, // join the game, uses
     SYNC, // request game data transmission
     CHAT,
     SET_READY,

@@ -33,10 +33,7 @@ public class Waluta {
 
         JButton button = new JButton("Wyczyść pola");
         content.add(button);
-        button.addActionListener(actionEvent -> {
-            euroField.setText("");
-            plnField.setText("");
-        });
+        button.addActionListener(new ButtonActionListener());
 
         frame.setSize(350,150);
         frame.setVisible(true);
@@ -64,6 +61,14 @@ public class Waluta {
             else if(actionEvent.getSource() == plnField) {
                 euroField.setText(String.format("%.2f",  Konwerter.PLNToEuro(value)));
             }
+        }
+    }
+
+    private class ButtonActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            euroField.setText("");
+            plnField.setText("");
         }
     }
 
