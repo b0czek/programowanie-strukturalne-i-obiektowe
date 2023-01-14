@@ -3,6 +3,9 @@ package Uno.Network.Client;
 import Uno.Engine.Deck.Deck;
 import Uno.Engine.Player.Player;
 import Uno.Engine.Player.PlayerController;
+import Uno.Network.Server.ClientRequest.ClientRequest;
+import Uno.Network.Server.ClientRequest.RequestType;
+import Uno.Network.Server.Message.Response;
 import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
 
 import javax.swing.*;
@@ -16,15 +19,16 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Client {
     private static Selector selector;
-
+    private static SocketChannel s;
     private static ByteBuffer buffer = ByteBuffer.allocate(64 * 1024);
 
     public static void main(String[] args) throws IOException {
-        SocketChannel s = SocketChannel.open(new InetSocketAddress("localhost", 42069));
+        s = SocketChannel.open(new InetSocketAddress("localhost", 42069));
         s.configureBlocking(false);
         System.out.println("connecting to " + s.getRemoteAddress());
 
@@ -32,16 +36,36 @@ public class Client {
         s.register(selector, SelectionKey.OP_READ);
 
 
-        PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(pbos);
 
-//        oos.writeObject(new Player(0, new PlayerController(null), "name", new Deck()));
-        System.out.println(pbos.getCount());
+        new Thread(() -> {
+            Scanner scanner = new Scanner(System.in);
+            String name =scanner.nextLine();
+            try {
+                write(new ClientRequest(RequestType.JOIN, name));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                write(new ClientRequest(RequestType.CHAT_HISTORY, null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-        s.write(ByteBuffer.wrap(pbos.getBuf()));
+
+            while(s.isOpen()) {
+                String message = scanner.nextLine();
+                try {
+                    write(new ClientRequest(RequestType.CHAT_MESSAGE, message));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+
+        }).start();
 
         while (s.isOpen()) {
-
+            System.out.println("selecting");
             try {
                 selector.select();
             } catch (IOException e) {
@@ -61,6 +85,14 @@ public class Client {
             }
         }
     }
+
+    private static void write(ClientRequest request) throws IOException {
+        PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(pbos);
+        oos.writeObject(request);
+        s.write(ByteBuffer.wrap(pbos.getBuf()));
+    }
+
     private static void read(SelectionKey key) {
 
         SocketChannel client = (SocketChannel) key.channel();
@@ -79,18 +111,17 @@ public class Client {
             }
 
         } catch (IOException e) {
-            System.out.println("error reading from client " + e.getMessage());
+            System.out.println("error reading from server " + e.getMessage());
             return;
         }
 
         try(
                 ByteArrayInputStream bis = new ByteArrayInputStream(byteArrayOutputStream.getBuf(), 0, byteArrayOutputStream.getCount());
                 ObjectInputStream ois = new ObjectInputStream(bis);
-
         ) {
             Object obj = ois.readObject();
+
             System.out.println(obj.toString());
-//            System.out.println(Arrays.toString(player.getHand().toArray()));
 
 
         } catch (IOException | ClassNotFoundException ex) {
@@ -98,18 +129,6 @@ public class Client {
         }
 
     }
-
-        //        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
-//        System.out.println("opened object output stream");
-//
-//        while(true) {
-//                oos.writeObject();
-//
-////            if(ois.available() >0) {
-////                System.out.println(ois.readObject());
-////            }
-//
-//        }
 }
 
 

@@ -1,31 +1,50 @@
 package Uno.Network.Server.Message;
 
+import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
+
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.UUID;
 
 public class Message implements Serializable {
 
-    public static final long serialVersionUID = 1L;
-    private Command command;
+    public static final long serialVersionUID = 2L;
+    private MessageType messageType;
 
     private Object attachment;
 
-    public Message() {}
 
-    public Message(Command command, Object attachment) {
-        this.command = command;
+    public Message(MessageType messageType, Object attachment) {
+        this.messageType = messageType;
         this.attachment = attachment;
     }
 
-    public Command getCommand() {
-        return command;
+    public MessageType getMessageType() {
+        return messageType;
     }
 
     public Object getAttachment() {
         return attachment;
     }
 
+
+
     @Override
     public String toString() {
-        return "[Message: " + command.toString() + "] " + attachment.toString();
+        return "[Message: " + messageType.toString() + "] " + (attachment == null ? "null" : attachment.toString());
+    }
+
+
+    public static ByteBuffer wrapMessage(Message message) {
+        try {
+            PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(pbos);
+            oos.writeObject(message);
+            return ByteBuffer.wrap(pbos.getBuf());
+        } catch (IOException ex) {
+            // should never happen
+            throw new IllegalStateException(ex);
+        }
+
     }
 }
