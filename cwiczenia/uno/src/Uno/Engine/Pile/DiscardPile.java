@@ -79,6 +79,8 @@ public class DiscardPile extends Pile {
         this.clear();
         this.add(lastCard);
 
+        this.notifier.notifyDiscardPileCleared();
+
         return subList;
     }
 

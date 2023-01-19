@@ -2,24 +2,24 @@ package Uno.Engine;
 
 import Uno.Engine.Card.Card;
 import Uno.Engine.Card.Color;
-import Uno.Engine.GameDirection;
 import Uno.Engine.Player.Player;
 import Uno.Engine.Player.PlayerInfo;
 import Uno.Engine.Round.Round;
+import Uno.Engine.Round.RoundEvent;
 
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class BasicGame {
 
-    private Round round;
-    private Scanner scanner;
+    private final Round round;
+    private final Scanner scanner;
 
     private boolean gameEnded = false;
 
     private void printPlayer(Player player) {
         System.out.println("Gracz: " + player.getName());
-        System.out.println("Karty: \n" + player.getHand().stream().map(card -> card.toString()).collect(Collectors.joining("\n")));
+        System.out.println("Karty: \n" + player.getHand().stream().map(Card::toString).collect(Collectors.joining("\n")));
         System.out.println("Aktualna karta na stosie: " + player.controller.getLastPlayedCard().toString());
         System.out.println("Aktualny kolor: " + player.controller.getCurrentColor());
         System.out.println("Kierunek gry: " + player.controller.getGameDirection());
@@ -67,7 +67,7 @@ public class BasicGame {
                     case 1 -> chooseCard(player);
                     case 2 -> player.controller.challengeWildcard(player);
                     case 3 -> player.controller.yellUno(player);
-                    case 4 -> player.controller.catchNotYelledUno(player);
+                    case 4 -> player.controller.catchNotYelledUno();
                     case 5 -> player.controller.drawCard(player);
                     case 6 -> player.controller.passTurn(player);
                 }
@@ -85,12 +85,59 @@ public class BasicGame {
     public BasicGame(Round round) {
         this.round = round;
         this.scanner = new Scanner(System.in);
+        this.round.getNotifier().addRoundEventListener(new RoundEvent() {
+            @Override
+            public void onDirectionSwitch(GameDirection newDirection) {
 
-        this.round.addRoundEndListener(winner -> {
-            gameEnded = true;
-            System.out.println("BRAWA DLA " + winner.getName());
+            }
+
+            @Override
+            public void onTurnFinish(PlayerInfo nextPlayer) {
+
+            }
+
+            @Override
+            public void onCardPlaced(Card placedCard) {
+
+            }
+
+            @Override
+            public void onCardDrew() {
+
+            }
+
+            @Override
+            public void onDiscardPileCleared() {
+
+            }
+
+            @Override
+            public void onCurrentColorChange(Color newColor) {
+
+            }
+
+            @Override
+            public void onCardRemovedFromHand(PlayerInfo affectedPlayer) {
+
+            }
+
+            @Override
+            public void onCardAddedToHand(PlayerInfo affectedPlayer) {
+
+            }
+
+            @Override
+            public void onYelledUno(PlayerInfo yellingPlayer) {
+
+            }
+
+            @Override
+            public void onRoundEnd(PlayerInfo winner) {
+                gameEnded = true;
+                System.out.println("BRAWA DLA " + winner.getName());
+
+            }
         });
-
         while(!gameEnded) {
             chooseMove(round.getPlayers().getCurrentPlayer());
         }

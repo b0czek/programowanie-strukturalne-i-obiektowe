@@ -31,8 +31,12 @@ public class RoundEventNotifier {
 
 
     public void notifyCardDrew() {
-        roundEventListeners.forEach(listener -> listener.onCardDrew());
+        roundEventListeners.forEach(RoundEvent::onCardDrew);
 
+    }
+
+    public void notifyDiscardPileCleared() {
+        roundEventListeners.forEach(RoundEvent::onDiscardPileCleared);
     }
 
     public void notifyCurrentColorChange(Color newColor) {

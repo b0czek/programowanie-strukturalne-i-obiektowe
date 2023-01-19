@@ -1,17 +1,16 @@
 package Uno.Engine.Player;
 
-import Uno.Engine.Card.Action;
 import Uno.Engine.Card.Card;
 import Uno.Engine.Card.Color;
 import Uno.Engine.GameDirection;
+import Uno.Engine.Pile.DiscardPile;
 import Uno.Engine.Round.Round;
 import Uno.Engine.Round.RoundEvent;
 
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Optional;
 
 public class PlayerController {
-    private Round round;
+    private final Round round;
 
     public PlayerController(Round round) {
         this.round = round;
@@ -19,10 +18,10 @@ public class PlayerController {
 
     public void playCard(Player player, Card playedCard) {
         checkTurn(player);
-
         if(round.getPlayers().peekPreviousPlayer().isChallengeable()) {
             throw new IllegalStateException("Player needs to select whether to challenge previous player");
         }
+
 
         if(!player.getHand().contains(playedCard)) {
             throw new IllegalArgumentException("Player may not play card they don't have in their hand");
@@ -37,7 +36,6 @@ public class PlayerController {
 
         // round won
         if(player.getHand().size() == 0) {
-            round.notifyRoundEndListeners(player);
             round.getNotifier().notifyRoundEnd(player.getInfo());
         }
         else {
@@ -72,7 +70,7 @@ public class PlayerController {
         round.getPlayers().peekPreviousPlayer().setChallengeable(false);
     }
 
-    public void yellUno(Player player) {
+    public void yellUno(Player player) throws IllegalStateException {
         checkTurn(player);
 
         if(player.getHand().size() != 2) {
@@ -82,7 +80,7 @@ public class PlayerController {
         player.setYelledUno(true);
     }
 
-    public void catchNotYelledUno(Player player) {
+    public void catchNotYelledUno() {
         if(round.getPlayers().peekPreviousPlayer().getHand().size() != 1) {
             throw new IllegalStateException("Previous player did not need to yell UNO");
         }
@@ -125,6 +123,12 @@ public class PlayerController {
     public Color getCurrentColor() {
         return round.getDiscardPile().getCurrentColor();
     }
+    public DiscardPile getDiscardPile() {
+        return round.getDiscardPile();
+    }
+    public int getDrawPileSize() {
+        return round.getDrawPile().size();
+    }
     public Card getLastPlayedCard() {
         return round.getDiscardPile().getLastCard();
     }
@@ -135,9 +139,17 @@ public class PlayerController {
         return round.getPlayers()
                 .getPlayers()
                 .stream()
-                .map(player -> player.getInfo())
+                .map(Player::getInfo)
                 .toArray(PlayerInfo[]::new);
     }
+    public Optional<Player> getPlayerInfo(String name) {
+        return round.getPlayers()
+                .getPlayers()
+                .stream()
+                .filter(player -> player.getName().equals(name))
+                .findFirst();
+    }
+
 
     public PlayerInfo getCurrentTurnPlayer() {
         return round.getPlayers().getCurrentPlayer().getInfo();

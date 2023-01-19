@@ -1,7 +1,9 @@
 package Uno.Network.Server.ClientRequest.RequestHandlers;
 
 import Uno.Network.Server.ClientRequest.ClientRequest;
+import Uno.Network.Server.Game.GameClient;
 import Uno.Network.Server.Game.GameServer;
+import Uno.Network.Server.Game.GameState;
 import Uno.Network.Server.ServerClient;
 
 import java.io.IOException;
@@ -11,8 +13,11 @@ public class Lobby {
         gameServer.getClients().get(serverClient).setReady(true);
         serverClient.sendEmptyOkResponse(request);
 
-        if(gameServer.getClients().values().stream().allMatch(gameClient -> gameClient.isReady())) {
-            // TODO: implement changing gamemode to in progress
+        if(gameServer.getClients().values().stream().allMatch(GameClient::isReady)) {
+            if(gameServer.getClients().size() >= 3) {
+                gameServer.setGameState(GameState.IN_PROGRESS);
+
+            }
         }
     }
     public static void handleClientNotReady(GameServer gameServer, ServerClient serverClient, ClientRequest request) throws IOException {

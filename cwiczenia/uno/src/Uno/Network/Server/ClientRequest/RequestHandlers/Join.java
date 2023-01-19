@@ -4,9 +4,12 @@ import Uno.Network.Server.ClientRequest.ClientRequest;
 import Uno.Network.Server.Game.GameClient;
 import Uno.Network.Server.Game.GameServer;
 import Uno.Network.Server.Game.GameState;
+import Uno.Network.Server.Message.Message;
+import Uno.Network.Server.Message.MessageType;
 import Uno.Network.Server.ServerClient;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class Join {
 
@@ -30,7 +33,7 @@ public class Join {
                 .entrySet()
                 .stream()
                 .filter(client -> client.getValue().getName().equals(name))
-                .map(client -> client.getKey())
+                .map(Map.Entry::getKey)
                 .toArray(ServerClient[]::new);
 
         // new player joining lobby
@@ -52,6 +55,10 @@ public class Join {
         }
         System.out.println("player " + name + " joined the game");
         serverClient.sendEmptyOkResponse(request);
+        // send sync data to player
+        Sync.syncPlayer(gameServer, serverClient);
+
+        gameServer.getServer().broadcast(new Message(MessageType.CLIENT_JOINED, gameServer.getClients().get(serverClient)));
 
     }
 

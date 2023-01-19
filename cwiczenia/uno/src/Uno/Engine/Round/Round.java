@@ -10,8 +10,6 @@ import Uno.Engine.Player.Player;
 import Uno.Engine.Player.Players;
 import Uno.Engine.Player.PlayerController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,8 +22,6 @@ public class Round {
     private final RoundEventNotifier notifier;
 
     private final PlayerController controller;
-
-    private final ArrayList<RoundEndCallback> roundEndListeners;
 
     public Round(String[] playerNames) {
         Deck deck = new Deck();
@@ -49,7 +45,6 @@ public class Round {
 
         useCard(drawPile.getLastCard());
 
-        roundEndListeners = new ArrayList<>();
     }
 
     public void useCard(Card playedCard) {
@@ -66,18 +61,11 @@ public class Round {
                 .flatMapToInt(player -> player
                             .getHand()
                             .stream()
-                            .mapToInt(card -> card.getPoints())
+                            .mapToInt(Card::getPoints)
                 )
                 .sum();
     }
 
-
-    public void addRoundEndListener(RoundEndCallback callback) {
-        roundEndListeners.add(callback);
-    }
-    public void notifyRoundEndListeners(Player winner) {
-        roundEndListeners.forEach(listener -> listener.onRoundEnd(winner));
-    }
 
     public Players getPlayers() {
         return players;

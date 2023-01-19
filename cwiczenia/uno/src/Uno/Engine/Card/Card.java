@@ -2,7 +2,7 @@ package Uno.Engine.Card;
 
 import java.io.*;
 
-public class Card implements Serializable {
+public class Card implements Externalizable {
     public static final long serialVersionUID = 1L;
 
     private Color color;
@@ -74,4 +74,23 @@ public class Card implements Serializable {
         return c.getAction() == this.action && c.getColor() == this.color && c.getValue() == this.value;
     }
 
+    @Override
+    public void writeExternal(ObjectOutput objectOutput) throws IOException {
+        objectOutput.writeObject(color);
+        objectOutput.writeObject(value);
+        objectOutput.writeObject(action);
+        if(action != Action.NONE) {
+            objectOutput.writeObject(action.getChangeColorTo());
+        }
+    }
+
+    @Override
+    public void readExternal(ObjectInput objectInput) throws IOException, ClassNotFoundException {
+        this.color = (Color) objectInput.readObject();
+        this.value = (Value) objectInput.readObject();
+        this.action = (Action) objectInput.readObject();
+        if(action != Action.NONE) {
+            action.setChangeColorTo((Color) objectInput.readObject());
+        }
+    }
 }

@@ -3,7 +3,6 @@ package Uno.Engine.Round;
 import Uno.Engine.Card.Card;
 import Uno.Engine.Card.Color;
 import Uno.Engine.GameDirection;
-import Uno.Engine.Player.Player;
 import Uno.Engine.Player.PlayerInfo;
 
 public interface RoundEvent {
@@ -16,6 +15,7 @@ public interface RoundEvent {
     void onCardPlaced(Card placedCard);
 
     void onCardDrew();
+    void onDiscardPileCleared();
 
     void onCurrentColorChange(Color newColor);
 
