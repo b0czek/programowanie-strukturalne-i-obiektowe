@@ -6,9 +6,14 @@ import java.util.UUID;
 public class ClientRequest implements Serializable {
     public static final long serialVersionUID = 1L;
 
-    private UUID requestUuid = UUID.randomUUID();
-    private RequestType requestType;
-    private Object attachment;
+    private final UUID requestUuid = UUID.randomUUID();
+    private final RequestType requestType;
+    private final Object attachment;
+
+    public ClientRequest(RequestType requestType) {
+        this.requestType = requestType;
+        this.attachment = null;
+    }
 
     public ClientRequest(RequestType requestType, Object attachment) {
         this.requestType = requestType;

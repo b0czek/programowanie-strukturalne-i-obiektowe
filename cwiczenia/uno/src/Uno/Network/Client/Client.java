@@ -1,75 +1,61 @@
 package Uno.Network.Client;
 
-import Uno.Engine.Deck.Deck;
-import Uno.Engine.Player.Player;
-import Uno.Engine.Player.PlayerController;
 import Uno.Network.Server.ClientRequest.ClientRequest;
-import Uno.Network.Server.ClientRequest.RequestType;
-import Uno.Network.Server.Message.Response;
+import Uno.Network.Server.Message.Message;
 import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
 
-import javax.swing.*;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.nio.channels.spi.SelectorProvider;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
-public class Client {
-    private static Selector selector;
-    private static SocketChannel s;
-    private static ByteBuffer buffer = ByteBuffer.allocate(64 * 1024);
+public class Client extends Thread {
+    private final Selector selector;
+    private final SocketChannel socketChannel;
+    private final ByteBuffer byteBuffer = ByteBuffer.allocate(128*1024);
+    private ArrayList<ClientEvent> eventListeners = new ArrayList<>();
 
-    public static void main(String[] args) throws IOException {
-        s = SocketChannel.open(new InetSocketAddress("localhost", 42069));
-        s.configureBlocking(false);
-        System.out.println("connecting to " + s.getRemoteAddress());
+
+    public Client(String host, int port) throws IOException {
+        socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
+        socketChannel.configureBlocking(false);
+        System.out.println("connecting to " + socketChannel.getRemoteAddress());
 
         selector = Selector.open();
-        s.register(selector, SelectionKey.OP_READ);
+        socketChannel.register(selector, SelectionKey.OP_READ);
 
+    }
 
+    private void handleDisconnect()  {
+        try {
+            socketChannel.close();
+        } catch (IOException e) {
+            System.out.println("could not close client socket - " + e.getMessage());
+        }
+        notifyDisconnect();
+    }
+    public void addEventListener(ClientEvent listener) {
+        eventListeners.add(listener);
+    }
 
-        new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-            String name =scanner.nextLine();
-            try {
-                write(new ClientRequest(RequestType.JOIN, name));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                write(new ClientRequest(RequestType.CHAT_HISTORY, null));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    public boolean removeEventListener(ClientEvent listener) {
+        return eventListeners.remove(listener);
+    }
 
-
-            while(s.isOpen()) {
-                String message = scanner.nextLine();
-                try {
-                    write(new ClientRequest(RequestType.CHAT_MESSAGE, message));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-
-        }).start();
-
-        while (s.isOpen()) {
-            System.out.println("selecting");
+    @Override
+    public void run() {
+        while(socketChannel.isOpen()) {
             try {
                 selector.select();
-            } catch (IOException e) {
-                System.out.println("could not select keys " + e.getMessage());
+            }
+            catch (IOException ex) {
+                System.out.println("could not select keys " + ex.getMessage());
             }
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> iter = selectedKeys.iterator();
@@ -78,57 +64,64 @@ public class Client {
                 SelectionKey key = iter.next();
                 iter.remove();
                 if (key.isReadable()) {
-                    System.out.println("readable");
-
-                    read(key);
+                    handleRead(key);
                 }
             }
         }
     }
 
-    private static void write(ClientRequest request) throws IOException {
-        PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(pbos);
-        oos.writeObject(request);
-        s.write(ByteBuffer.wrap(pbos.getBuf()));
-    }
-
-    private static void read(SelectionKey key) {
-
+    public void handleRead(SelectionKey key) {
         SocketChannel client = (SocketChannel) key.channel();
-        buffer.clear();
+        byteBuffer.clear();
         PromiscousByteArrayOutputStream byteArrayOutputStream = new PromiscousByteArrayOutputStream();
 
         try {
             int read;
-            while((read = client.read(buffer)) > 0) {
-                byteArrayOutputStream.write(buffer.array(), 0, read);
-                System.out.println(read);
+            while((read = client.read(byteBuffer)) > 0) {
+                byteArrayOutputStream.write(byteBuffer.array(), 0, read);
+
             }
             if(read < 0) {
-                client.close();
+                this.handleDisconnect();
                 return;
             }
-
-        } catch (IOException e) {
-            System.out.println("error reading from server " + e.getMessage());
+        }
+        catch (IOException ex) {
+            this.handleDisconnect();
             return;
         }
 
-        try(
+        try (
                 ByteArrayInputStream bis = new ByteArrayInputStream(byteArrayOutputStream.getBuf(), 0, byteArrayOutputStream.getCount());
-                ObjectInputStream ois = new ObjectInputStream(bis);
+                ObjectInputStream ois = new ObjectInputStream(bis)
         ) {
-            Object obj = ois.readObject();
-
-            System.out.println(obj.toString());
+            Message message = (Message)ois.readObject();
+            notifyMessage(message);
 
 
         } catch (IOException | ClassNotFoundException ex) {
             System.out.println("failed parsing received data, " + ex.getMessage());
+            notifyReadError(ex.getMessage());
+
         }
 
     }
+
+
+    public void writeRequest(ClientRequest request) throws IOException {
+        PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(pbos);
+        oos.writeObject(request);
+        socketChannel.write(ByteBuffer.wrap(pbos.getBuf()));
+    }
+
+    private void notifyDisconnect() {
+        eventListeners.forEach(ClientEvent::onDisconnect);
+    }
+    private void notifyMessage(Message message) {
+        eventListeners.forEach(clientEvent -> clientEvent.onMessage(message));
+    }
+    private void notifyReadError(String message) {
+        eventListeners.forEach(clientEvent -> clientEvent.onReadError(message));
+    }
 }
-
-
