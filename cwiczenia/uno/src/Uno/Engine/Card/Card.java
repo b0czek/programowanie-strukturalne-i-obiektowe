@@ -50,11 +50,18 @@ public class Card implements Externalizable {
 
 
     public int getPoints() {
-        return switch (this.action) {
-            case NONE -> this.value.ordinal();
-            case DRAW_TWO, REVERSE, SKIP -> 20;
-            case WILD_CARD, WILD_DRAW_4 -> 50;
-        };
+        switch (this.action) {
+            case NONE: return this.value.ordinal();
+            case DRAW_TWO:
+            case REVERSE:
+            case SKIP:
+                return 20;
+            case WILD_CARD:
+            case WILD_DRAW_4:
+                return 50;
+            default:
+                return 0;
+        }
     }
 
     @Override
@@ -68,9 +75,10 @@ public class Card implements Externalizable {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Card c)) {
+        if(!(obj instanceof Card)) {
             return false;
         }
+        Card c = (Card) obj;
         return c.getAction() == this.action && c.getColor() == this.color && c.getValue() == this.value;
     }
 

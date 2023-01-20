@@ -63,14 +63,14 @@ public class BasicGame {
             System.out.println("6. passTurn");
 
             try {
-                switch(scanner.nextInt()) {
-                    case 1 -> chooseCard(player);
-                    case 2 -> player.controller.challengeWildcard(player);
-                    case 3 -> player.controller.yellUno(player);
-                    case 4 -> player.controller.catchNotYelledUno();
-                    case 5 -> player.controller.drawCard(player);
-                    case 6 -> player.controller.passTurn(player);
-                }
+//                switch(scanner.nextInt()) {
+//                    case 1 -> chooseCard(player);
+//                    case 2 -> player.controller.challengeWildcard(player);
+//                    case 3 -> player.controller.yellUno(player);
+//                    case 4 -> player.controller.catchNotYelledUno();
+//                    case 5 -> player.controller.drawCard(player);
+//                    case 6 -> player.controller.passTurn(player);
+//                }
 
             }
             catch(Exception ex) {

@@ -16,19 +16,36 @@ import java.util.function.Consumer;
 
 public class GameClient {
     private final String username;
+    private final String host;
+    private final int port;
     private Client client;
-    private ConcurrentHashMap<MessageType, ArrayList<Consumer<Object>>> messageHandlers = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<UUID, Consumer<Response>> responseHandlers = new ConcurrentHashMap<>();
-    private Timer timer = new Timer();
+    private final ConcurrentHashMap<MessageType, ArrayList<Consumer<Object>>> messageHandlers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, Consumer<Response>> responseHandlers = new ConcurrentHashMap<>();
+    private final ArrayList<Runnable> disconnectHandlers = new ArrayList<>();
+
+    private final Timer timer = new Timer();
 
     public GameClient(String username, String host, int port) throws IOException {
-        client = new Client(host, port);
-        client.addEventListener(new ClientEventHandler());
 
         for(MessageType messageType : MessageType.values()) {
             messageHandlers.put(messageType, new ArrayList<>());
         }
         this.username = username;
+        this.host = host;
+        this.port = port;
+
+        this.connect();
+    }
+
+    private void connect() throws IOException {
+        client = new Client(host, port);
+        client.addEventListener(new ClientEventHandler());
+        client.start();
+    }
+
+    public void reconnect() throws IOException {
+        this.connect();
+        this.join();
     }
 
     public void join() throws IOException {
@@ -56,6 +73,7 @@ public class GameClient {
         @Override
         public void onDisconnect() {
             timer.cancel();
+            disconnectHandlers.forEach(Runnable::run);
         }
 
         @Override
@@ -73,8 +91,15 @@ public class GameClient {
 
         @Override
         public void onReadError(String errorMessage) {
-
+            System.out.println("error reading message from server " + errorMessage);
         }
+    }
+
+    public void addDisconnectHandler(Runnable handler) {
+        disconnectHandlers.add(handler);
+    }
+    public boolean removeDisconnectHandler(Runnable handler) {
+        return disconnectHandlers.remove(handler);
     }
 
     public void addMessageHandler(MessageType messageType, Consumer<Object> messageHandler) {

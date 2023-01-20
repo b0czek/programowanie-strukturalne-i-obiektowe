@@ -128,7 +128,6 @@ public class GameServer {
     private void playerTimeoutHandler() {
         Instant timeoutAfter = Instant.now().minusSeconds(SECONDS_TO_TIMEOUT);
         clients.forEach((key, value) -> {
-            System.out.println(value.getName() + " " + value.getLastHeartbeatTime());
             if (timeoutAfter.isAfter(value.getLastHeartbeatTime())) {
                 System.out.println("client " + value.getName() + " disconnected due to timeout");
                 disconnectClient(key);
