@@ -7,6 +7,7 @@ import Uno.Network.Server.Message.MessageType;
 import Uno.Network.Server.Message.Response;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -110,6 +111,9 @@ public class GameClient {
     }
 
     public void sendRequest(ClientRequest request) throws IOException {
+        if(request.isAttachmentValid()) {
+            throw new InvalidObjectException("invalid object attached to the request");
+        }
         client.writeRequest(request);
     }
 

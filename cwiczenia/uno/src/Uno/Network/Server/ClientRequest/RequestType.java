@@ -12,9 +12,9 @@ import Uno.Network.Server.ServerClient;
 import java.io.IOException;
 
 public enum RequestType {
-    JOIN(null, String.class, Join::handleClientJoin), // join the game
+    JOIN(null, String.class, Join::handleClientJoin),
     HEARTBEAT(null, null, Heartbeat::handleHeartbeat),
-    SYNC(null, null, Sync::handleSync), // request game data transmission
+    SYNC(null, null, Sync::handleSync),
     CHAT_MESSAGE(null, String.class, Chat::handleChatMessage),
     CHAT_HISTORY(null, null, Chat::handleChatHistory),
     CLIENTS_DATA(null, null, GameInfo::handleClientsData),
