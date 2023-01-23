@@ -111,7 +111,7 @@ public class GameClient {
     }
 
     public void sendRequest(ClientRequest request) throws IOException {
-        if(request.isAttachmentValid()) {
+        if(!request.isAttachmentValid()) {
             throw new InvalidObjectException("invalid object attached to the request");
         }
         client.writeRequest(request);

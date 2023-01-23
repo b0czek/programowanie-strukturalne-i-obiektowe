@@ -6,11 +6,17 @@ import Uno.Network.Server.ClientRequest.RequestType;
 import Uno.Network.Server.Message.MessageType;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Scanner;
 
 public class BasicClient {
     private static boolean isConnected = true;
     public static void main(String[] args) throws IOException {
+        GameDiscovery gameDiscovery = new GameDiscovery();
+        gameDiscovery.addDiscoveryListener((servers) -> servers.forEach(server -> System.out.println(server.getAddress() + " " + server.getHostname() + " " + server.getPort())));
+        gameDiscovery.start();
+        gameDiscovery.broadcastRequest();
+
         Scanner scanner = new Scanner(System.in);
         System.out.print("username: ");
         String username = scanner.nextLine();

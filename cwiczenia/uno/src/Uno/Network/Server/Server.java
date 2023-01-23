@@ -1,19 +1,14 @@
 package Uno.Network.Server;
 
 import Uno.Network.Server.ClientRequest.ClientRequest;
-import Uno.Network.Server.ClientRequest.RequestType;
 import Uno.Network.Server.Message.Message;
 import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class Server extends Thread {
     private final int serverPort;
+    private final ServerDiscovery serverDiscovery;
     private final ServerSocketChannel serverSocket;
     private final Selector selector;
     private ByteBuffer buffer = ByteBuffer.allocate(128 * 1024);
@@ -56,7 +52,8 @@ public class Server extends Thread {
         serverSocket.configureBlocking(false);
         serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 
-
+        this.serverDiscovery = new ServerDiscovery(serverPort);
+        this.serverDiscovery.start();
     }
 
     public void close() throws IOException {
@@ -65,6 +62,7 @@ public class Server extends Thread {
         }
         serverSocket.close();
         selector.close();
+        serverDiscovery.stopDiscovery();
     }
 
     public void addEventListener(ServerEvent listener) {
@@ -79,13 +77,14 @@ public class Server extends Thread {
     @Override
     public void run() {
         while (serverSocket.isOpen()) {
-
+            Set<SelectionKey> selectedKeys;
             try {
                 selector.select();
-            } catch (IOException e) {
+                selectedKeys = selector.selectedKeys();
+            } catch (IOException | ClosedSelectorException e) {
                 System.out.println("could not select keys " + e.getMessage());
+                continue;
             }
-            Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> iter = selectedKeys.iterator();
 
             while (iter.hasNext()) {

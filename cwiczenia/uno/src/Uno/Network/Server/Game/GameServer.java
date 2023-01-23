@@ -26,10 +26,13 @@ public class GameServer {
     private final ChatHistory chatHistory = new ChatHistory();
     private final ConcurrentHashMap<ServerClient, GameClient> clients = new ConcurrentHashMap<>();
 
+    private final Timer timer = new Timer();
+
     public GameServer(int port) throws IOException {
+        System.out.println("server opening on port " + port);
         server = new Server(port);
         server.addEventListener(new ServerEventHandler());
-        Timer timer = new Timer();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -43,12 +46,17 @@ public class GameServer {
             }
         }, 0, SYNC_PERIOD * 1000);
 
-    }
-
-    public void start() {
         this.server.start();
+        System.out.println("server started");
+
+
     }
 
+    public void stop() throws IOException {
+        this.timer.cancel();
+        this.server.close();
+
+    }
 
     public GameState getGameState() {
         return gameState;
