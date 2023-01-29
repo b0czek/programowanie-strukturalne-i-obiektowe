@@ -38,35 +38,33 @@ public class GameClient {
         this.connect();
     }
 
-    private void connect() throws IOException {
+    public void connect() throws IOException {
         client = new Client(host, port);
         client.addEventListener(new ClientEventHandler());
         client.start();
     }
-
-    public void reconnect() throws IOException {
-        this.connect();
-        this.join();
+    public void disconnect() throws IOException {
+        this.client.disconnect();
     }
 
-    public void join() throws IOException {
+    public void join(Consumer<Response> onResponse) throws IOException {
         this.sendRequest(new ClientRequest(RequestType.JOIN, username), (Response response) -> {
             if(response.isRequestFailed()) {
                 System.out.println("failed to join the game");
+                timer.cancel();
             }
-            else {
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        try {
-                            sendRequest(new ClientRequest(RequestType.HEARTBEAT));
-                        } catch (IOException e) {
-                            System.out.println("failed to send heartbeat");
-                        }
-                    }
-                }, 0, 5000);
-            }
+            onResponse.accept(response);
         });
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    sendRequest(new ClientRequest(RequestType.HEARTBEAT));
+                } catch (IOException e) {
+                    System.out.println("failed to send heartbeat");
+                }
+            }
+        }, 0, 5000);
     }
 
     private class ClientEventHandler implements  ClientEvent {
@@ -94,6 +92,10 @@ public class GameClient {
         public void onReadError(String errorMessage) {
             System.out.println("error reading message from server " + errorMessage);
         }
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void addDisconnectHandler(Runnable handler) {

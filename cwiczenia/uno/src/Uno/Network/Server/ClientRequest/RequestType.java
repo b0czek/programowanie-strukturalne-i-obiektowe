@@ -40,7 +40,8 @@ public enum RequestType {
 
 
     SET_READY(GameState.LOBBY, null, Lobby::handleClientReady),
-    SET_NOT_READY(GameState.LOBBY, null, Lobby::handleClientNotReady);
+    SET_NOT_READY(GameState.LOBBY, null, Lobby::handleClientNotReady),
+    TOGGLE_READY(GameState.LOBBY, null, Lobby::handleToggleReady);
 
     private final RequestHandler handler;
     private final Class attachmentClass;

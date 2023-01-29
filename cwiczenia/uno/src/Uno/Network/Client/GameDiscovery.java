@@ -4,14 +4,12 @@ import Uno.Network.Server.ServerDiscovery;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class GameDiscovery extends Thread {
     private DatagramSocket socket;
+    private Timer broadcastTimer = new Timer();
 
     private HashSet<DiscoveredServer> discoveredServers = new HashSet<>();
 
@@ -20,6 +18,28 @@ public class GameDiscovery extends Thread {
     public GameDiscovery() throws SocketException {
         socket = new DatagramSocket();
         socket.setBroadcast(true);
+        scheduleBroadcast();
+    }
+    public GameDiscovery(Consumer<HashSet<DiscoveredServer>> listener) throws SocketException {
+        socket = new DatagramSocket();
+        socket.setBroadcast(true);
+        scheduleBroadcast();
+        addDiscoveryListener(listener);
+        start();
+        broadcastRequest();
+    }
+    private void scheduleBroadcast() {
+        broadcastTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                broadcastRequest();
+            }
+        }, 0, 5000);
+    }
+    public void close() {
+        broadcastTimer.cancel();
+        socket.close();
+
     }
 
     public void addDiscoveryListener(Consumer<HashSet<DiscoveredServer>> listener) {
@@ -79,7 +99,7 @@ public class GameDiscovery extends Thread {
 
     @Override
     public void run() {
-        while(true) {
+        while(!socket.isClosed()) {
             byte[] buf = new byte[1024];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {

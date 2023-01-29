@@ -2,13 +2,12 @@ package Uno.Network.Client;
 
 import Uno.Network.Server.ClientRequest.ClientRequest;
 import Uno.Network.Server.Message.Message;
+import Uno.Network.Utilities.PosByteArrayInputStream;
 import Uno.Network.Utilities.PromiscousByteArrayOutputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -29,7 +28,12 @@ public class Client extends Thread {
 
         selector = Selector.open();
         socketChannel.register(selector, SelectionKey.OP_READ);
+        socketChannel.socket().setReceiveBufferSize(1024*1024);
 
+    }
+
+    public void disconnect() throws IOException {
+        handleDisconnect();
     }
 
     private void handleDisconnect()  {
@@ -66,18 +70,30 @@ public class Client extends Thread {
                 if (key.isReadable()) {
                     handleRead(key);
                 }
+                if(key.isConnectable()) {
+                    handleConnect(key);
+                }
             }
+        }
+    }
+    public void handleConnect(SelectionKey key) {
+        System.out.println("handleConnect");
+        SocketChannel client = (SocketChannel) key.channel();
+        try {
+            client.socket().setReceiveBufferSize(1024*1024);
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void handleRead(SelectionKey key) {
         SocketChannel client = (SocketChannel) key.channel();
-        byteBuffer.clear();
         PromiscousByteArrayOutputStream byteArrayOutputStream = new PromiscousByteArrayOutputStream();
 
         try {
             int read;
             while((read = client.read(byteBuffer)) > 0) {
+                byteBuffer.clear();
                 byteArrayOutputStream.write(byteBuffer.array(), 0, read);
 
             }
@@ -90,22 +106,35 @@ public class Client extends Thread {
             this.handleDisconnect();
             return;
         }
+        int offset = 0;
+        while(offset < byteArrayOutputStream.getCount()) {
 
-        try (
-                ByteArrayInputStream bis = new ByteArrayInputStream(byteArrayOutputStream.getBuf(), 0, byteArrayOutputStream.getCount());
-                ObjectInputStream ois = new ObjectInputStream(bis)
-        ) {
-            Message message = (Message)ois.readObject();
-            notifyMessage(message);
+            try(
+                    PosByteArrayInputStream bis = new PosByteArrayInputStream(byteArrayOutputStream.getBuf(), offset, byteArrayOutputStream.getCount() - offset);
+            ) {
+                if(!bis.seekHeader()) {
+                    break;
+                }
+                ObjectInputStream ois = new ObjectInputStream(bis);
 
+                Message message = (Message)ois.readObject();
+                offset = bis.getPos();
 
-        } catch (IOException | ClassNotFoundException ex) {
-            System.out.println("failed parsing received data, " + ex.getMessage());
-            notifyReadError(ex.getMessage());
+//                System.out.println("Received message, type: " +message.getMessageType());
+                notifyMessage(message);
+
+            } catch (IOException | ClassNotFoundException ex) {
+                System.out.println("offset: "+ offset + " length: " + (byteArrayOutputStream.getCount() - offset));
+                System.out.println(ex.getClass().getSimpleName() + " failed parsing received data, " + ex.getMessage());
+                notifyReadError(ex.getMessage());
+                break;
+
+            }
 
         }
 
-    }
+        }
+
 
 
     public void writeRequest(ClientRequest request) throws IOException {

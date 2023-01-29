@@ -109,11 +109,11 @@ public class PlayerController {
     public void passTurn(Player player) {
         checkTurn(player);
 
-        round.getPlayers().peekPreviousPlayer().setChallengeable(false);
 
-        if(!player.didDrawCard()) {
+        if(!player.didDrawCard() && !round.getPlayers().peekPreviousPlayer().isChallengeable()) {
             drawCardFromPile(player);
         }
+        round.getPlayers().peekPreviousPlayer().setChallengeable(false);
 
         round.getPlayers().goToNextPlayer();
 
@@ -142,6 +142,14 @@ public class PlayerController {
                 .map(Player::getInfo)
                 .toArray(PlayerInfo[]::new);
     }
+
+    public boolean canChallenge(Player player){
+        if(round.getPlayers().getCurrentPlayer() == player) {
+            return round.getPlayers().peekPreviousPlayer().isChallengeable();
+        }
+        return false;
+    }
+
     public Optional<Player> getPlayerInfo(String name) {
         return round.getPlayers()
                 .getPlayers()

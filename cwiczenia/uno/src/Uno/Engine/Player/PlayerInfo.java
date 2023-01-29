@@ -10,12 +10,16 @@ public class PlayerInfo implements Serializable {
     private int cardsInHandCount;
     private int ordinal;
 
+    private boolean canChallenge;
+    private boolean yelledUno;
     public PlayerInfo() {}
 
-    public PlayerInfo(String name, int cardsInHandCount, int ordinal ) {
+    public PlayerInfo(String name, int cardsInHandCount, int ordinal, boolean yelledUno, boolean canChallenge) {
         this.name = name;
         this.cardsInHandCount = cardsInHandCount;
         this.ordinal = ordinal;
+        this.yelledUno = yelledUno;
+        this.canChallenge = canChallenge;
     }
 
     public String getName() {
@@ -30,4 +34,11 @@ public class PlayerInfo implements Serializable {
         return ordinal;
     }
 
+    public boolean isYelledUno() {
+        return yelledUno;
+    }
+
+    public boolean isCanChallenge() {
+        return canChallenge;
+    }
 }

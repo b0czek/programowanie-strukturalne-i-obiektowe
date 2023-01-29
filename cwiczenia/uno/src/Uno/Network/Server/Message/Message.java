@@ -9,6 +9,8 @@ import java.util.UUID;
 public class Message implements Serializable {
 
     public static final long serialVersionUID = 2L;
+
+    public static final String MESSAGE_HEADER = "UNOMESSAGEHEADER";
     private MessageType messageType;
 
     private Object attachment;
@@ -38,6 +40,7 @@ public class Message implements Serializable {
     public static ByteBuffer wrapMessage(Message message) {
         try {
             PromiscousByteArrayOutputStream pbos = new PromiscousByteArrayOutputStream();
+            pbos.writeBytes(MESSAGE_HEADER.getBytes());
             ObjectOutputStream oos = new ObjectOutputStream(pbos);
             oos.writeObject(message);
             return ByteBuffer.wrap(pbos.getBuf());

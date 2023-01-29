@@ -17,6 +17,7 @@ public class PromiscousByteArrayOutputStream extends ByteArrayOutputStream {
     }
 
     public byte[] getBuf() {
+
         return buf;
     }
 }

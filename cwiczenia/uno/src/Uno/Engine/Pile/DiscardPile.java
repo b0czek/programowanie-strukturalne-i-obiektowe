@@ -12,7 +12,7 @@ public class DiscardPile extends Pile {
 
     private Color previousColor;
     private Color currentColor;
-    private RoundEventNotifier notifier = null;
+    private transient RoundEventNotifier notifier = null;
 
     public DiscardPile() {
 

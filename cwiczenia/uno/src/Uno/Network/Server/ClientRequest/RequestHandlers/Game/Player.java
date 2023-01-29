@@ -39,7 +39,7 @@ public class Player {
             serverClient.sendEmptyErrorResponse(request, ex.getMessage());
             return;
         }
-        serverClient.sendEmptyOkResponse(request);
+        serverClient.sendOkResponse(request, MessageType.HAND, player.getHand());
     }
 
     public static void handleChallengeWildcard(GameServer gameServer, ServerClient serverClient, ClientRequest request) throws IOException {

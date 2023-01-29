@@ -1,17 +1,15 @@
 package Uno;
 
+import Uno.GUI.GUI;
 import Uno.Network.Server.Game.GameServer;
 
+import javax.swing.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class Main {
-    public static void main(String[] args) {
-//        Game game = new Game(new String[]{"natalia1", "natalia2", "darek"});
-        try {
-            GameServer server = new GameServer(42069);
-        }
-        catch (IOException ex) {
-            System.out.println("could not start game server: " + ex.getMessage());
-        }
+    public static void main(String[] args) throws InterruptedException, InvocationTargetException {
+        SwingUtilities.invokeAndWait(() -> new GUI());
     }
+
 }

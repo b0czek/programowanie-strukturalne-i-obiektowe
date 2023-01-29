@@ -13,6 +13,7 @@ import Uno.Network.Server.ServerEvent;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,9 +27,11 @@ public class GameServer {
     private final ChatHistory chatHistory = new ChatHistory();
     private final ConcurrentHashMap<ServerClient, GameClient> clients = new ConcurrentHashMap<>();
 
+    private final Runnable serverStartListener;
+
     private final Timer timer = new Timer();
 
-    public GameServer(int port) throws IOException {
+    public GameServer(int port, Runnable serverStartListener) throws IOException {
         System.out.println("server opening on port " + port);
         server = new Server(port);
         server.addEventListener(new ServerEventHandler());
@@ -45,6 +48,8 @@ public class GameServer {
                 syncClients();
             }
         }, 0, SYNC_PERIOD * 1000);
+
+        this.serverStartListener = serverStartListener;
 
         this.server.start();
         System.out.println("server started");
@@ -79,6 +84,11 @@ public class GameServer {
     }
 
     private class ServerEventHandler implements ServerEvent {
+
+        @Override
+        public void onServerStart() {
+            serverStartListener.run();
+        }
 
         @Override
         public void onClientConnected(ServerClient serverClient) {
@@ -136,7 +146,7 @@ public class GameServer {
     private void playerTimeoutHandler() {
         Instant timeoutAfter = Instant.now().minusSeconds(SECONDS_TO_TIMEOUT);
         clients.forEach((key, value) -> {
-            if (timeoutAfter.isAfter(value.getLastHeartbeatTime())) {
+            if (timeoutAfter.isAfter(value.getLastHeartbeatTime()) && value.isConnected()) {
                 System.out.println("client " + value.getName() + " disconnected due to timeout");
                 disconnectClient(key);
             }
@@ -168,7 +178,7 @@ public class GameServer {
     }
 
     private void syncClients() {
-        Sync.syncPlayers(this, clients.values().stream().map(GameClient::getServerClient).toArray(ServerClient[]::new));
+        Sync.syncPlayers(this, clients.values().stream().filter(client -> client.isConnected()).map(GameClient::getServerClient).toArray(ServerClient[]::new));
     }
 
 

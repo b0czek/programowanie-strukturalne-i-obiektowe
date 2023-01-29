@@ -6,6 +6,7 @@ import Uno.Network.Server.Message.Message;
 import Uno.Network.Server.Message.MessageType;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
@@ -18,7 +19,11 @@ public class ServerClient {
     }
 
     public void sendMessage(Message message) throws IOException {
-        ((SocketChannel) selectionKey.channel()).write(Message.wrapMessage(message));
+        SocketChannel socketChannel = ((SocketChannel) selectionKey.channel());
+        ByteBuffer bb = Message.wrapMessage(message);
+        int w;
+        while ((w = socketChannel.write(bb)) > 0 || bb.remaining() > 0) {
+        }
     }
 
     public void sendEmptyErrorResponse(ClientRequest responseTo, String statusMessage) throws IOException {

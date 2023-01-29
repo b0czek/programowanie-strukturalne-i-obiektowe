@@ -19,7 +19,7 @@ public class Server extends Thread {
     private final ServerDiscovery serverDiscovery;
     private final ServerSocketChannel serverSocket;
     private final Selector selector;
-    private ByteBuffer buffer = ByteBuffer.allocate(128 * 1024);
+    private ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
 
     private ArrayList<ServerEvent> eventListeners = new ArrayList<>();
 
@@ -76,6 +76,8 @@ public class Server extends Thread {
 
     @Override
     public void run() {
+        notifyServerStarted();
+
         while (serverSocket.isOpen()) {
             Set<SelectionKey> selectedKeys;
             try {
@@ -104,14 +106,13 @@ public class Server extends Thread {
     private void handleRead(SelectionKey key) {
 
         SocketChannel client = (SocketChannel) key.channel();
-        buffer.clear();
         PromiscousByteArrayOutputStream byteArrayOutputStream = new PromiscousByteArrayOutputStream();
 
         try {
             int read;
             while ((read = client.read(buffer)) > 0) {
+                buffer.clear();
                 byteArrayOutputStream.write(buffer.array(), 0, read);
-                System.out.println(read);
             }
 
             if (read < 0) {
@@ -148,6 +149,8 @@ public class Server extends Thread {
         String address;
         try {
             SocketChannel client = ((ServerSocketChannel) key.channel()).accept();
+            client.socket().setSendBufferSize(1024*1024);
+
             address = client.getRemoteAddress().toString();
 
             System.out.println("client connecting from " + address);
@@ -167,6 +170,7 @@ public class Server extends Thread {
 
 
     public void broadcast(Message message) {
+
         ByteBuffer buf = Message.wrapMessage(message);
         var clients = this.currentlyConnectedClients();
 
@@ -186,7 +190,9 @@ public class Server extends Thread {
 
 
 
-
+    private void notifyServerStarted() {
+        eventListeners.forEach(ServerEvent::onServerStart);
+    }
 
     private void notifyClientConnected(ServerClient serverClient) {
         eventListeners.forEach(listener -> listener.onClientConnected(serverClient));

@@ -54,11 +54,11 @@ public class Join {
             return;
         }
         System.out.println("player " + name + " joined the game");
+        gameServer.getServer().broadcast(new Message(MessageType.CLIENT_JOINED, gameServer.getClients().get(serverClient)));
         serverClient.sendEmptyOkResponse(request);
         // send sync data to player
         Sync.syncPlayer(gameServer, serverClient);
 
-        gameServer.getServer().broadcast(new Message(MessageType.CLIENT_JOINED, gameServer.getClients().get(serverClient)));
 
     }
 

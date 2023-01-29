@@ -62,7 +62,7 @@ public class Player implements Serializable {
     }
 
     public PlayerInfo getInfo() {
-        return new PlayerInfo(name, hand.size(), ordinal);
+        return new PlayerInfo(name, hand.size(), ordinal, yelledUno, controller.canChallenge(this));
     }
 
 

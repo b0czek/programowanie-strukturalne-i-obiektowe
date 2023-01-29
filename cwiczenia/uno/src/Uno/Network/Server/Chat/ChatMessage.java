@@ -21,6 +21,10 @@ public class ChatMessage implements Serializable {
         return senderName;
     }
 
+    public String formatMessage() {
+        return this.senderName + ": " + this.text + "\n";
+    }
+
     @Override
     public String toString() {
         return "ChatMessage - " + senderName + ": " + text;

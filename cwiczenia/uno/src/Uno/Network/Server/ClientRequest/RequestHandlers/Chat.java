@@ -23,6 +23,7 @@ public class Chat {
         ChatMessage chatMessage = new ChatMessage(message, gameServer.getClients().get(serverClient).getName());
         gameServer.getChatHistory().add(chatMessage);
         System.out.println("new chat message: "+chatMessage);
+        serverClient.sendEmptyOkResponse(request);
         gameServer.getServer().broadcast(new Message(MessageType.CHAT_MESSAGE, chatMessage));
     }
 

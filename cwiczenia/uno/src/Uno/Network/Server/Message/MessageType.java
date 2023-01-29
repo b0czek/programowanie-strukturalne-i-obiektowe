@@ -22,13 +22,13 @@ public enum MessageType {
 
     // in-game
     PLAYER_DATA(PlayerInfo.class),
-    PLAYERS_DATA(PlayerInfo.class),
+    PLAYERS_DATA(PlayerInfo[].class),
 
     HAND(Pile.class),
     GAME_DIRECTION(GameDirection.class),
     CURRENT_TURN_PLAYER(PlayerInfo.class),
     CURRENT_COLOR(Color.class),
-    DISCARD_PILE(DiscardPile.class),
+    DISCARD_PILE(Pile.class),
     DRAW_PILE_SIZE(Integer.class),
 
     // event based

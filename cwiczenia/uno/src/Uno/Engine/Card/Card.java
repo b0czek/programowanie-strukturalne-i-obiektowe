@@ -1,6 +1,7 @@
 package Uno.Engine.Card;
 
 import java.io.*;
+import java.util.Objects;
 
 public class Card implements Externalizable {
     public static final long serialVersionUID = 1L;
@@ -80,6 +81,11 @@ public class Card implements Externalizable {
         }
         Card c = (Card) obj;
         return c.getAction() == this.action && c.getColor() == this.color && c.getValue() == this.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, value, action);
     }
 
     @Override
