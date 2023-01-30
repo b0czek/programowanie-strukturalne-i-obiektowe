@@ -8,11 +8,11 @@ import Uno.Engine.Deck.Deck;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 public class CardImageProvider {
     public static final int cardWidth = 134;
@@ -27,15 +27,24 @@ public class CardImageProvider {
         cards.add(new Card(Color.NONE, Value.NONE, Action.NONE));
         cards.forEach(card -> {
             try {
-                Image cardImage = ImageIO.read(new File(String.format("cards/%s_%s_%s.png", card.getValue(), card.getColor(), card.getAction()))).getScaledInstance(cardWidth,cardHeight, Image.SCALE_SMOOTH);
+                String filename = getCardFilename(card);
+                var stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
+                if(stream == null) {
+                    stream = new FileInputStream(filename);
+                }
+                Image cardImage = ImageIO.read(stream)
+                        .getScaledInstance(cardWidth,cardHeight, Image.SCALE_SMOOTH);
+
                 cardImages.put(card, cardImage);
             } catch (IOException e) {
                 System.out.println("could not load card "+ card + " " + e.getMessage());
-                throw new RuntimeException(e);
             }
         });
     }
 
+    private static String getCardFilename(Card card) {
+        return Paths.get("cards", String.format("%s_%s_%s.png", card.getValue(), card.getColor(), card.getAction())).toString();
+    }
 
     public static  Image get(Card card) {
         if(cardImages != null ){

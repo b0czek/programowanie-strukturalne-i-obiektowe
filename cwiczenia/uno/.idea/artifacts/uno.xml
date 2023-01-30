@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="uno">
+    <output-path>$PROJECT_DIR$/out/artifacts/uno</output-path>
+    <root id="archive" name="uno.jar">
+      <element id="directory" name="cards">
+        <element id="dir-copy" path="$PROJECT_DIR$/cards" />
+      </element>
+      <element id="module-output" name="uno" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>
