@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GameServer {
     public static final int SECONDS_TO_TIMEOUT = 20;
-    public static final int SYNC_PERIOD = 10;
+    public static final int SYNC_PERIOD = 1;
     private GameState gameState = GameState.LOBBY;
     private final Server server;
     private Game game = null;

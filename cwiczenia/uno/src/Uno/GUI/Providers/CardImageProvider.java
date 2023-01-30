@@ -43,7 +43,7 @@ public class CardImageProvider {
     }
 
     private static String getCardFilename(Card card) {
-        return Paths.get("cards", String.format("%s_%s_%s.png", card.getValue(), card.getColor(), card.getAction())).toString();
+        return String.format("cards/%s_%s_%s.png", card.getValue(), card.getColor(), card.getAction());
     }
 
     public static  Image get(Card card) {

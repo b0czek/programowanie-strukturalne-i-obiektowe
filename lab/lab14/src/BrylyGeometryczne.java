@@ -116,7 +116,8 @@ public class BrylyGeometryczne {
         while(true) {
             IntStream.range(0, prompts.length).forEach(i -> System.out.println((i+1) + ". " + prompts[i]));
             int c = in.nextInt();
-            runnables[c-1].run();
+            if(c > 0 && c <= prompts.length)
+                runnables[c-1].run();
         }
 
     }
